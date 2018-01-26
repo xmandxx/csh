@@ -92,6 +92,7 @@
         <activity android:name=".activity.home.FuelcardActivity" />
         <activity android:name=".activity.personal.DriverAuthActivity" />
         <activity android:name=".activity.personal.MyOrderActivity"></activity>
+        <activity android:name=".activity.personal.MyCarActivity" />
     </application>
 
 </manifest>

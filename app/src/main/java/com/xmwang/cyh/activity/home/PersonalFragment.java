@@ -14,6 +14,7 @@ import android.widget.TextView;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.xmwang.cyh.R;
 import com.xmwang.cyh.activity.personal.DriverAuthActivity;
+import com.xmwang.cyh.activity.personal.MyCarActivity;
 import com.xmwang.cyh.activity.personal.MyOrderActivity;
 import com.xmwang.cyh.activity.personal.SettingActivity;
 import com.xmwang.cyh.activity.personal.WalletActivity;
@@ -143,6 +144,7 @@ public class PersonalFragment extends LazyLoadFragment {
             case R.id.ll_sc:
                 break;
             case R.id.ll_aiche:
+                startActivity(new Intent(context, MyCarActivity.class));
                 break;
             case R.id.ll_renzheng:
                 if (Data.instance.getUserInfo().getDriver_status() == 0){

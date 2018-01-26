@@ -1,6 +1,7 @@
 package com.xmwang.cyh.api;
 
 import com.xmwang.cyh.model.BaseModel;
+import com.xmwang.cyh.model.LoveCarModel;
 import com.xmwang.cyh.model.OrderModel;
 import com.xmwang.cyh.model.UserInfo;
 
@@ -64,4 +65,19 @@ public interface ApiUserService {
                              @Field("order_type") int order_type,
                              @Field("pageSize") int pageSize,
                              @Field("pageIndex") int pageIndex);
+    //我的爱车
+    @FormUrlEncoded
+    @POST("userinfo/user_cars_list")
+    Call<LoveCarModel> user_cars_list(@Field("admin_id") String admin_id,
+                                      @Field("user_id") String user_id,
+                                      @Field("pageSize") int pageSize,
+                                      @Field("pageIndex") int pageIndex);
+
+    //
+    @FormUrlEncoded
+    @POST("userinfo/user_cars_status")
+    Call<BaseModel> user_cars_status(@Field("admin_id") String admin_id,
+                                      @Field("user_id") String user_id,
+                                      @Field("car_id") int car_id,
+                                      @Field("type") int type);
 }
