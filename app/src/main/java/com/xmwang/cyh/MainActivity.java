@@ -16,7 +16,8 @@ public class MainActivity extends BaseActivity {
         setContentView(R.layout.activity_main);
 
         if (Data.instance.getIsLogin()){
-            Intent intent = new Intent(MainActivity.this, IndexActivity.class);
+//            Intent intent = new Intent(MainActivity.this, IndexActivity.class);
+            Intent intent = new Intent(MainActivity.this, com.xmwang.cyh.daijia.IndexActivity.class);
             startActivity(intent);
             finish();
         }else{

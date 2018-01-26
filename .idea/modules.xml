@@ -3,7 +3,7 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
-      <module fileurl="file://$PROJECT_DIR$/csh377.iml" filepath="$PROJECT_DIR$/csh377.iml" />
+      <module fileurl="file://$PROJECT_DIR$/csh.iml" filepath="$PROJECT_DIR$/csh.iml" />
       <module fileurl="file://$PROJECT_DIR$/library_easyrecyclerview/library_easyrecyclerview.iml" filepath="$PROJECT_DIR$/library_easyrecyclerview/library_easyrecyclerview.iml" />
       <module fileurl="file://$PROJECT_DIR$/library_jdselector/library_jdselector.iml" filepath="$PROJECT_DIR$/library_jdselector/library_jdselector.iml" />
       <module fileurl="file://$PROJECT_DIR$/sweet_alert_dialog_library/sweet_alert_dialog_library.iml" filepath="$PROJECT_DIR$/sweet_alert_dialog_library/sweet_alert_dialog_library.iml" />

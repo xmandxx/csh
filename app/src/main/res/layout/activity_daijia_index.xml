@@ -20,31 +20,19 @@
         android:textColor="@color/whiteColor"
         android:textSize="@dimen/text_bar" />
 
-    <!--<LinearLayout-->
-        <!--android:id="@+id/title_back"-->
-        <!--android:layout_width="@dimen/common_bar"-->
-        <!--android:layout_height="match_parent"-->
-        <!--android:gravity="center">-->
+        <TextView
+        android:id="@+id/title_right"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_alignParentRight="true"
+        android:clickable="true"
+        android:gravity="center"
+        android:paddingRight="10dp"
+        android:text="代驾管理"
+        android:textColor="@color/white"
+        android:textSize="@dimen/text_14"
+        android:visibility="visible" />
 
-        <!--<ImageView-->
-            <!--android:layout_width="@dimen/bar_back"-->
-            <!--android:layout_height="@dimen/bar_back"-->
-            <!--android:src="@mipmap/ic_back" />-->
-    <!--</LinearLayout>-->
-
-    <!--<LinearLayout-->
-        <!--android:id="@+id/title_right"-->
-        <!--android:layout_width="@dimen/common_bar"-->
-        <!--android:layout_height="match_parent"-->
-        <!--android:layout_alignParentRight="true"-->
-        <!--android:gravity="center">-->
-
-        <!--<ImageView-->
-            <!--android:id="@+id/title_right_img"-->
-            <!--android:layout_width="20dp"-->
-            <!--android:layout_height="20dp"-->
-            <!--android:src="@mipmap/ic_search" />-->
-    <!--</LinearLayout>-->
     </RelativeLayout>
     <LinearLayout
         android:layout_width="match_parent"

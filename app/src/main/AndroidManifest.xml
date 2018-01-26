@@ -37,6 +37,14 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:replace="android:icon, android:label">
+
+        <!-- 定位需要的服务 使用2.0的定位需要加上这个 -->
+        <service android:name="com.amap.api.location.APSService" />
+        <!-- 高德key -->
+        <meta-data
+            android:name="com.amap.api.v2.apikey"
+            android:value="fdd0670eb8a61e9920b280b6fe1f21b8" />
+
         <activity android:name=".MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -49,50 +57,95 @@
             android:name=".wxapi.WXPayEntryActivity"
             android:exported="true"
             android:launchMode="singleTop" />
-
-        <!-- 高德key -->
-        <meta-data
-            android:name="com.amap.api.v2.apikey"
-            android:value="fdd0670eb8a61e9920b280b6fe1f21b8" />
-
-        <activity android:name=".daijia.IndexActivity" />
-        <activity android:name=".daijia.EditParmentActivity" />
-        <activity android:name=".daijia.CreateDJOrderActivity" />
-        <activity android:name=".daijia.TaximeterActivity" />
-        <activity android:name=".daijia.OverOrderActivity" />
-        <activity android:name=".activity.user.LoginActivity" />
-        <activity android:name=".daijia.TempListActivity" />
+        <activity
+            android:name=".daijia.IndexActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".daijia.EditParmentActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".daijia.CreateDJOrderActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".daijia.TaximeterActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".daijia.OverOrderActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".activity.user.LoginActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".daijia.TempListActivity"
+            android:screenOrientation="portrait" />
         <activity
             android:name=".daijia.EditTempActivity"
+            android:screenOrientation="portrait"
             android:windowSoftInputMode="stateHidden" />
         <activity
             android:name=".activity.home.IndexActivity"
             android:label="@string/title_activity_index"
+            android:screenOrientation="portrait"
             android:theme="@style/AppTheme" />
-        <activity android:name=".activity.user.RegisterActivity" />
-        <activity android:name=".activity.user.ForgetPwdActivity" />
-        <activity android:name=".daijia.ChooseLocationActivity" />
-        <activity android:name=".activity.business.BusinessDetailActivity" />
-
-        <!-- 定位需要的服务 使用2.0的定位需要加上这个 -->
-        <service android:name="com.amap.api.location.APSService" />
-
-        <activity android:name=".activity.personal.SettingActivity" />
+        <activity
+            android:name=".activity.user.RegisterActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".activity.user.ForgetPwdActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".daijia.ChooseLocationActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".activity.business.BusinessDetailActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".activity.personal.SettingActivity"
+            android:screenOrientation="portrait" />
         <activity
             android:name=".activity.personal.ProfileActivity"
+            android:screenOrientation="portrait"
             android:windowSoftInputMode="stateHidden" />
-        <activity android:name=".activity.personal.UserAddressActivity" />
-        <activity android:name=".activity.personal.WalletActivity" />
-        <activity android:name=".activity.personal.RechargeActivity" />
-        <activity android:name=".activity.personal.CashActivity" />
-        <activity android:name=".activity.home.CouponsActivity" />
-        <activity android:name=".activity.home.YangcheActivity" />
-        <activity android:name=".activity.home.AddYangcheActivity" />
-        <activity android:name=".activity.home.RoadescueActivity" />
-        <activity android:name=".activity.home.FuelcardActivity" />
-        <activity android:name=".activity.personal.DriverAuthActivity" />
-        <activity android:name=".activity.personal.MyOrderActivity"></activity>
-        <activity android:name=".activity.personal.MyCarActivity" />
+        <activity
+            android:name=".activity.personal.UserAddressActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".activity.personal.WalletActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".activity.personal.RechargeActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".activity.personal.CashActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".activity.home.CouponsActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".activity.home.YangcheActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".activity.home.AddYangcheActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".activity.home.RoadescueActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".activity.home.FuelcardActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".activity.personal.DriverAuthActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".activity.personal.MyOrderActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".activity.personal.MyCarActivity"
+            android:screenOrientation="portrait" />
+        <activity android:name=".daijia.ManagerActivity" android:screenOrientation="portrait" />
+        <activity android:name=".daijia.OrderActivity" android:screenOrientation="portrait" />
+        <activity android:name=".daijia.AccActivity" android:screenOrientation="portrait" />
+        <activity android:name=".daijia.OrderDetailActivity" android:screenOrientation="portrait"  />
     </application>
 
 </manifest>

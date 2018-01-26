@@ -3,8 +3,10 @@ package com.xmwang.cyh.daijia;
 import android.location.Location;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
 import android.util.Log;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
@@ -16,6 +18,7 @@ import com.amap.api.maps.CameraUpdate;
 import com.amap.api.maps.CameraUpdateFactory;
 import com.amap.api.maps.MapView;
 import com.amap.api.maps.UiSettings;
+import com.amap.api.maps.model.BitmapDescriptorFactory;
 import com.amap.api.maps.model.CameraPosition;
 import com.amap.api.maps.model.LatLng;
 import com.amap.api.maps.model.Marker;
@@ -32,9 +35,14 @@ import com.amap.api.services.help.InputtipsQuery;
 import com.amap.api.services.help.Tip;
 import com.amap.api.services.poisearch.PoiResult;
 import com.amap.api.services.poisearch.PoiSearch;
+import com.jude.easyrecyclerview.EasyRecyclerView;
+import com.jude.easyrecyclerview.adapter.BaseViewHolder;
+import com.jude.easyrecyclerview.adapter.RecyclerArrayAdapter;
+import com.jude.easyrecyclerview.decoration.DividerDecoration;
 import com.xmwang.cyh.BaseActivity;
 import com.xmwang.cyh.R;
 import com.xmwang.cyh.common.Data;
+import com.xmwang.cyh.viewholder.ChooseLocationHolder;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -49,16 +57,16 @@ public class ChooseLocationActivity extends BaseActivity implements AMap.OnMyLoc
     EditText titleText;
     @BindView(R.id.map)
     MapView mapView;
-    @BindView(R.id.list_view)
-    ListView listView;
-
+    @BindView(R.id.erv_list)
+    EasyRecyclerView ervList;
+    private RecyclerArrayAdapter<PoiItem> adapter;
     AMap aMap;
     MyLocationStyle myLocationStyle;
     private UiSettings mUiSettings;//定义一个UiSettings对象
     Marker marker;
     GeocodeSearch geocoderSearch;
     String city;
-    Location currLocation;
+    LatLng currLocation;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -82,14 +90,34 @@ public class ChooseLocationActivity extends BaseActivity implements AMap.OnMyLoc
     }
 
     private void init() {
-        //初始化地图控制器对象
+        //1.
+        //列表处理
+        ervList.setLayoutManager(new LinearLayoutManager(this) {
+            @Override
+            public boolean canScrollVertically() {
+                return true;
+            }
+
+        });
+        DividerDecoration itemDecoration = new DividerDecoration(this.getResources().getColor(R.color.backgroundColor), 1, 0, 0);
+        itemDecoration.setDrawLastItem(false);
+        ervList.addItemDecoration(itemDecoration);
+
+        ervList.setAdapterWithProgress(adapter = new RecyclerArrayAdapter<PoiItem>(this) {
+            @Override
+            public BaseViewHolder OnCreateViewHolder(ViewGroup parent, int viewType) {
+                return new ChooseLocationHolder(parent);
+            }
+        });
+
+
+        //2.初始化地图控制器对象
         if (aMap == null) {
             aMap = mapView.getMap();
         }
 
         //设置希望展示的地图缩放级别
-        CameraUpdate mCameraUpdate = CameraUpdateFactory.zoomTo(15);
-        aMap.animateCamera(mCameraUpdate);
+        aMap.animateCamera(CameraUpdateFactory.zoomTo(15));
 
         //初始化定位蓝点样式类myLocationStyle.myLocationType(MyLocationStyle.LOCATION_TYPE_LOCATION_ROTATE);
         //连续定位、且将视角移动到地图中心点，定位点依照设备方向旋转，并且会跟随设备移动。（1秒1次定位）如果不设置myLocationType，默认也会执行此种模式。
@@ -135,7 +163,7 @@ public class ChooseLocationActivity extends BaseActivity implements AMap.OnMyLoc
             //设置希望展示的地图缩放级别
             CameraUpdate mCameraUpdate = CameraUpdateFactory.zoomTo(15);
             aMap.animateCamera(mCameraUpdate);
-            currLocation = location;
+            currLocation = new LatLng(location.getLatitude(),location.getLongitude());
             Log.e("amap", "onMyLocationChange 定位成功， lat: " + location.getLatitude() + " lon: " + location.getLongitude());
             Bundle bundle = location.getExtras();
             if (bundle != null) {
@@ -144,12 +172,6 @@ public class ChooseLocationActivity extends BaseActivity implements AMap.OnMyLoc
                 // 定位类型，可能为GPS WIFI等，具体可以参考官网的定位SDK介绍
                 int locationType = bundle.getInt(MyLocationStyle.LOCATION_TYPE);
 
-                /*
-                errorCode
-                errorInfo
-                locationType
-                */
-//                Log.e("amap", "定位信息， code: " + errorCode + " errorInfo: " + errorInfo + " locationType: " + locationType );
                 if (errorCode > 0) {
                     Toast.makeText(this, "定位失败，请打开定位权限", Toast.LENGTH_SHORT).show();
                 }
@@ -157,8 +179,6 @@ public class ChooseLocationActivity extends BaseActivity implements AMap.OnMyLoc
                 LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
                 marker.setPosition(latLng);
                 //
-                //调取一次获取周边
-                searchPOI();
 
             } else {
                 Log.e("amap", "定位信息， bundle is null ");
@@ -174,6 +194,7 @@ public class ChooseLocationActivity extends BaseActivity implements AMap.OnMyLoc
 
     @Override
     public void onCameraChange(CameraPosition cameraPosition) {
+        currLocation = cameraPosition.target;
         regeocodeQuery(cameraPosition.target.latitude, cameraPosition.target.longitude);
         marker.setPosition(cameraPosition.target);
     }
@@ -190,11 +211,71 @@ public class ChooseLocationActivity extends BaseActivity implements AMap.OnMyLoc
 //        startLocation.setText(result.getRegeocodeAddress().getFormatAddress());
         city = result.getRegeocodeAddress().getCity();
         Data.instance.setFormatAddress(result.getRegeocodeAddress().getFormatAddress());
+        //调取一次获取周边
+        searchPOI();
     }
 
     @Override
     public void onGeocodeSearched(GeocodeResult geocodeResult, int i) {
 
+    }
+
+
+
+    //poi
+    InputtipsQuery inputquery;
+    PoiSearch poiSearch;
+    private PoiSearch.Query query;// Poi查询条件类
+    private PoiResult poiResult; // poi返回的结果
+    private List<PoiItem> poiItems;// poi数据
+
+    /**
+     * 获取周边信息
+     */
+    private void searchPOI() {
+//        if (poiSearch == null) {
+            query = new PoiSearch.Query("", "", city);// 第一个参数表示搜索字符串，第二个参数表示poi搜索类型，第三个参数表示poi搜索区域（空字符串代表全国）
+            query.setPageSize(20);// 设置每页最多返回多少条poiitem
+            query.setPageNum(1);// 设置查第一页
+            LatLonPoint lp = new LatLonPoint(currLocation.latitude,  currLocation.longitude);
+            poiSearch = new PoiSearch(this, query);
+            poiSearch.setOnPoiSearchListener(this);
+//        }
+        poiSearch.setBound(new PoiSearch.SearchBound(lp, 5000,true));
+        poiSearch.searchPOIAsyn();
+
+    }
+
+
+    @Override
+    public void onPoiSearched(PoiResult poiResult, int rCode) {
+        Log.e("xmwang","onPoiSearched");
+        List<PoiItem> poiItems = poiResult.getPois();
+        adapter.clear();
+        adapter.addAll(poiResult.getPois());
+    }
+
+    @Override
+    public void onPoiItemSearched(PoiItem poiItem, int i) {
+        Log.e("xmwang","onPoiItemSearched");
+    }
+
+    //输入内容自动提示
+    private void bindText(String newText){
+        InputtipsQuery inputquery = new InputtipsQuery(newText, city);
+        inputquery.setCityLimit(true);
+        Inputtips inputTips = new Inputtips(this, inputquery);
+        inputTips.setInputtipsListener(this);
+        inputTips.requestInputtipsAsyn();
+    }
+    @Override
+    public void onGetInputtips(List<Tip> list, int rCode) {
+        Log.e("xmwang","onGetInputtips");
+    }
+
+    @Override
+    public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+        Log.e("xmwang","onItemClick");
     }
 
     @Override
@@ -223,58 +304,5 @@ public class ChooseLocationActivity extends BaseActivity implements AMap.OnMyLoc
         super.onSaveInstanceState(outState);
         //在activity执行onSaveInstanceState时执行mMapView.onSaveInstanceState (outState)，保存地图当前的状态
         mapView.onSaveInstanceState(outState);
-    }
-
-    //poi
-    InputtipsQuery inputquery;
-    PoiSearch poiSearch;
-
-    /**
-     * 获取周边信息
-     */
-    private void searchPOI() {
-        if (poiSearch == null) {
-            poiSearch = new PoiSearch(this, null);
-            poiSearch.setOnPoiSearchListener(this);
-        }
-        poiSearch.setBound(new PoiSearch.SearchBound(new LatLonPoint(currLocation.getLatitude(), currLocation.getLongitude()), 1000));
-        poiSearch.searchPOIAsyn();
-
-    }
-
-
-    @Override
-    public void onPoiSearched(PoiResult poiResult, int rCode) {
-        Log.e("xmwang","onPoiSearched");
-        List<PoiItem> poiItems = poiResult.getPois();
-        listView.removeAllViews();
-        final List<String> data = new ArrayList<String>();
-        for (PoiItem poiItem : poiItems){
-            data.add(poiItem.getSnippet());
-        }
-        listView.setAdapter(new ArrayAdapter<String>(this, android.R.layout.simple_expandable_list_item_1, data));
-    }
-
-    @Override
-    public void onPoiItemSearched(PoiItem poiItem, int i) {
-        Log.e("xmwang","onPoiItemSearched");
-    }
-
-    //输入内容自动提示
-    private void bindText(String newText){
-        InputtipsQuery inputquery = new InputtipsQuery(newText, city);
-        inputquery.setCityLimit(true);
-        Inputtips inputTips = new Inputtips(this, inputquery);
-        inputTips.setInputtipsListener(this);
-        inputTips.requestInputtipsAsyn();
-    }
-    @Override
-    public void onGetInputtips(List<Tip> list, int rCode) {
-        Log.e("xmwang","onGetInputtips");
-    }
-
-    @Override
-    public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-        Log.e("xmwang","onItemClick");
     }
 }

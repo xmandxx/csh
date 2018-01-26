@@ -44,27 +44,28 @@ public class LoginActivity extends BaseActivity {
         ButterKnife.bind(this);
     }
 
-    @OnClick({R.id.tv_forget_pwd, R.id.tv_register, R.id.btn_login, R.id.btn_qq, R.id.btn_weixin, R.id.btn_sina})
+//    R.id.tv_register, R.id.btn_qq, R.id.btn_weixin, R.id.btn_sina
+    @OnClick({R.id.tv_forget_pwd, R.id.btn_login})
     public void onViewClicked(View view) {
         switch (view.getId()) {
             case R.id.tv_forget_pwd:
                 startActivity(new Intent(this,ForgetPwdActivity.class));
                 break;
-            case R.id.tv_register:
-                startActivity(new Intent(this,RegisterActivity.class));
-                break;
+//            case R.id.tv_register:
+//                startActivity(new Intent(this,RegisterActivity.class));
+//                break;
             case R.id.btn_login:
                 login();
                 break;
-            case R.id.btn_qq:
-                third_login(1);
-                break;
-            case R.id.btn_weixin:
-                third_login(2);
-                break;
-            case R.id.btn_sina:
-                third_login(3);
-                break;
+//            case R.id.btn_qq:
+//                third_login(1);
+//                break;
+//            case R.id.btn_weixin:
+//                third_login(2);
+//                break;
+//            case R.id.btn_sina:
+//                third_login(3);
+//                break;
         }
     }
 
@@ -120,7 +121,8 @@ public class LoginActivity extends BaseActivity {
                     return;
                 }
                 Data.instance.setUserInfo(userInfo.getData().get(0));
-                startActivity(new Intent(LoginActivity.this, IndexActivity.class));
+//                startActivity(new Intent(LoginActivity.this, IndexActivity.class));
+                startActivity(new Intent(LoginActivity.this, com.xmwang.cyh.daijia.IndexActivity.class));
                 finish();
             }
 

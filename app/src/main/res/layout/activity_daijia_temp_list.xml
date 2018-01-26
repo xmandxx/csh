@@ -43,18 +43,18 @@
         <!--android:textColor="@drawable/sel_text_white_gray"-->
         <!--android:textSize="@dimen/text_h"></ImageView>-->
 
-        <TextView
-            android:id="@+id/title_right"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_alignParentRight="true"
-            android:clickable="true"
-            android:gravity="center"
-            android:paddingRight="10dp"
-            android:text="添加"
-            android:textColor="@color/white"
-            android:textSize="@dimen/text_14"
-            android:visibility="visible" />
+        <!--<TextView-->
+            <!--android:id="@+id/title_right"-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="match_parent"-->
+            <!--android:layout_alignParentRight="true"-->
+            <!--android:clickable="true"-->
+            <!--android:gravity="center"-->
+            <!--android:paddingRight="10dp"-->
+            <!--android:text="添加"-->
+            <!--android:textColor="@color/white"-->
+            <!--android:textSize="@dimen/text_14"-->
+            <!--android:visibility="visible" />-->
 
     </RelativeLayout>
     <ListView

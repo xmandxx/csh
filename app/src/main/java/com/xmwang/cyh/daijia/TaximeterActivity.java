@@ -199,6 +199,7 @@ public class TaximeterActivity extends BaseActivity implements OnConfirmListener
         lbsTraceClient.startTrace(new TraceStatusListener() {
             @Override
             public void onTraceStatus(List<TraceLocation> list, List<LatLng> rectifications, String errorInfo) {
+                Log.e("xmwang","发起一次轨迹纠偏,msg:"+errorInfo);
                 //发起逆地理编码
                 if (list.size() > 0){
                     TraceLocation tl = list.get(list.size() - 1);

@@ -77,10 +77,16 @@ public interface ApiService {
                                 );
     //获取订单详情
     @FormUrlEncoded
+    @POST("drive/get_drive_order_list")
+    Call<DriveOrderInfo> getDriveOrderList(@Field("admin_id") String admin_id,
+                                       @Field("user_id") String user_id
+    );
+    //获取订单列表
+    @FormUrlEncoded
     @POST("drive/get_drive_order_info")
     Call<DriveOrderInfo> getDriveOrderInfo(@Field("admin_id") String admin_id,
-                                       @Field("user_id") String user_id,
-                                       @Field("order_id") String order_id
+                                           @Field("user_id") String user_id,
+                                           @Field("order_id") String order_id
     );
 
     //更新代驾数据

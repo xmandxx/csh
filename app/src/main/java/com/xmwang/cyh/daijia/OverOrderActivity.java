@@ -11,7 +11,10 @@ import com.xmwang.cyh.BaseActivity;
 import com.xmwang.cyh.R;
 import com.xmwang.cyh.common.Data;
 import com.xmwang.cyh.common.RetrofitHelper;
+import com.xmwang.cyh.common.event.UserDriverInfoEvent;
 import com.xmwang.cyh.model.DriveOrderInfo;
+
+import org.greenrobot.eventbus.EventBus;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -90,6 +93,7 @@ public class OverOrderActivity extends BaseActivity {
 
     @OnClick(R.id.btn_go_home)
     public void onViewClicked() {
+        EventBus.getDefault().post(new UserDriverInfoEvent());
         Intent intent = new Intent("com.overorder");
         sendBroadcast(intent);      //发送广播
         this.finish();

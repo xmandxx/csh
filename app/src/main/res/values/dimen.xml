@@ -7,7 +7,7 @@
     <dimen name="bottombar_height">48dp</dimen>
     <dimen name="common_item_height">48dp</dimen>
     <dimen name="common_marginleft">16dp</dimen>
-    <dimen name="button_height">48dp</dimen>
+    <dimen name="button_height">40dp</dimen>
     <dimen name="common_input">48dp</dimen>
     <dimen name="common_bar">48dp</dimen>
     <dimen name="common_marginleft_ln">10dp</dimen>

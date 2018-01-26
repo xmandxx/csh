@@ -5,14 +5,9 @@ import android.graphics.Color;
 import android.location.Location;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.Looper;
-import android.support.v7.app.AlertDialog;
-import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
-import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.View;
-import android.widget.ArrayAdapter;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -37,17 +32,22 @@ import com.amap.api.services.geocoder.RegeocodeQuery;
 import com.amap.api.services.geocoder.RegeocodeResult;
 import com.xmwang.cyh.BaseActivity;
 import com.xmwang.cyh.R;
-import com.xmwang.cyh.common.CustomToast;
 import com.xmwang.cyh.common.Data;
 import com.xmwang.cyh.common.RetrofitHelper;
 import com.xmwang.cyh.common.SADialog;
+import com.xmwang.cyh.common.event.UserDriverInfoEvent;
 import com.xmwang.cyh.model.BaseModel;
-import com.xmwang.cyh.model.Charging;
 import com.xmwang.cyh.model.DriveInfo;
+import com.xmwang.cyh.utils.ActivityManager;
+import com.xmwang.cyh.utils.GetTime;
 import com.xmwang.cyh.utils.ToastUtils;
 import com.yanzhenjie.permission.AndPermission;
 import com.yanzhenjie.permission.Permission;
 import com.yanzhenjie.permission.PermissionListener;
+
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 
 import java.util.Calendar;
 import java.util.List;
@@ -128,9 +128,39 @@ public class IndexActivity extends BaseActivity implements OnMyLocationChangeLis
                 .start();
 
     }
+    @Override
+    public void onBackPressed() {
+//        自己处理返回按键的内容
+//        //super.onBackPressed();
+        // 当popupWindow 正在展示的时候 按下返回键 关闭popupWindow 否则关闭activity
 
+        if (GetTime.getInstance().isFastDoubleClick(2000)) {
+            Call<BaseModel> call = RetrofitHelper.instance.getApiService().online(
+                    Data.instance.AdminId,
+                    Data.instance.getUserId(),
+                    "2",
+                    String.valueOf(currLocation.getLongitude()),
+                    String.valueOf(currLocation.getLatitude())
+            );
+            call.enqueue(new Callback<BaseModel>() {
+                @Override
+                public void onResponse(Call<BaseModel> call, Response<BaseModel> response) {
+
+                }
+
+                @Override
+                public void onFailure(Call<BaseModel> call, Throwable t) {
+
+                }
+            });
+            ActivityManager.getInstance().removeAllActivity();
+        } else {
+            ToastUtils.getInstance().toastShow("再按一次退出程序");
+        }
+    }
     private void init() {
-
+        //注册事件
+        EventBus.getDefault().register(this);
         //防止穿透
         linearLayout.setOnTouchListener(new View.OnTouchListener() {
             @Override
@@ -177,6 +207,10 @@ public class IndexActivity extends BaseActivity implements OnMyLocationChangeLis
         geocoderSearch.setOnGeocodeSearchListener(this);
     }
 
+    @Subscribe(threadMode = ThreadMode.MAIN) //在ui线程执行
+    public void onDataSynEvent(final UserDriverInfoEvent event) {
+        loadNetworkData();
+    }
     private void loadNetworkData(){
         Call<DriveInfo> call = RetrofitHelper.instance.getApiService().driveInfo(Data.instance.AdminId, Data.instance.getUserId());
         call.enqueue(new Callback<DriveInfo>() {
@@ -206,7 +240,7 @@ public class IndexActivity extends BaseActivity implements OnMyLocationChangeLis
         });
     }
 
-    @OnClick({R.id.start_location, R.id.end_location,R.id.btn_online, R.id.add_order, R.id.edit_parment})
+    @OnClick({R.id.start_location, R.id.end_location,R.id.btn_online, R.id.add_order, R.id.edit_parment,R.id.title_right})
     public void onViewClicked(View view) {
         switch (view.getId()) {
             case R.id.start_location:
@@ -229,6 +263,9 @@ public class IndexActivity extends BaseActivity implements OnMyLocationChangeLis
             case R.id.edit_parment:
                 //编辑参数
                 startActivity(new Intent(this, EditParmentActivity.class));
+                break;
+            case R.id.title_right:
+                startActivity(new Intent(this, ManagerActivity.class));
                 break;
         }
     }
@@ -382,6 +419,7 @@ public class IndexActivity extends BaseActivity implements OnMyLocationChangeLis
         //在activity执行onDestroy时执行mMapView.onDestroy()，销毁地图
         mapView.onDestroy();
         SADialog.instance.hideProgress();
+        EventBus.getDefault().unregister(this);//解除订阅
     }
 
     @Override

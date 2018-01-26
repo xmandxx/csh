@@ -1,2 +1,2 @@
 <?xml version="1.0" encoding="utf-8"?>
-<merger version="3"><dataSet config="main"><source path="/Developer/Android/csh377/sweet_alert_dialog_library/src/main/shaders"/></dataSet><dataSet config="debug"><source path="/Developer/Android/csh377/sweet_alert_dialog_library/src/debug/shaders"/></dataSet></merger>
+<merger version="3"><dataSet config="main"><source path="/Developer/android/csh/sweet_alert_dialog_library/src/main/shaders"/></dataSet><dataSet config="debug"><source path="/Developer/android/csh/sweet_alert_dialog_library/src/debug/shaders"/></dataSet></merger>

@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:fancy="http://schemas.android.com/apk/res-auto"
     android:background="@color/backgroundColor"
@@ -59,9 +60,11 @@
         android:id="@+id/map"
         android:layout_width="match_parent"
         android:layout_height="200dp"/>
-    <ListView
-        android:id="@+id/list_view"
+    <com.jude.easyrecyclerview.EasyRecyclerView
+        android:id="@+id/erv_list"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
-    </ListView>
+        android:layout_height="match_parent"
+        android:background="@color/backgroundColor"
+        app:scrollbarStyle="insideOverlay"
+        app:scrollbars="none" />
 </LinearLayout>

@@ -15,6 +15,9 @@ import com.tencent.mm.opensdk.openapi.IWXAPIEventHandler;
 import com.tencent.mm.opensdk.openapi.WXAPIFactory;
 import com.xmwang.cyh.R;
 import com.xmwang.cyh.common.Data;
+import com.xmwang.cyh.common.event.UserDriverInfoEvent;
+
+import org.greenrobot.eventbus.EventBus;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -60,6 +63,7 @@ public class WXPayEntryActivity extends Activity implements IWXAPIEventHandler {
             String msg = "";
             switch (resp.errCode) {
                 case BaseResp.ErrCode.ERR_OK:
+                    EventBus.getDefault().post(new UserDriverInfoEvent());
                     msg = "支付成功，等待充值完成";
                     break;
                 case BaseResp.ErrCode.ERR_USER_CANCEL:
