@@ -1,11 +1,14 @@
 package com.xmwang.cyh.common;
 
+import android.content.Context;
 import android.location.Location;
 
+import com.xmwang.cyh.MyApplication;
 import com.xmwang.cyh.model.DriveInfo;
 import com.xmwang.cyh.model.TempInfo;
 import com.xmwang.cyh.model.UserInfo;
 
+import cn.jpush.android.api.JPushInterface;
 import retrofit2.Callback;
 import retrofit2.Response;
 
@@ -17,6 +20,7 @@ public enum Data {
     instance;
     public final String USER_ID_KEY = "s_user_id";
     public final String WXKEY = "wxa856b974892faaa7";
+    public final String ALIPAY_KEY = "wxa856b974892faaa7";
     public String AdminId = "1";
     private boolean isLogin;
     private boolean isOnline;
@@ -29,6 +33,23 @@ public enum Data {
     private TempInfo.DataBean tempInfo;
     private Location location;
     private String formatAddress;
+    private String tempDestination;//临时存储目的地，非正式不传递给数据库
+
+    public String getTempDestination() {
+        return tempDestination;
+    }
+
+    public void setTempDestination(String tempDestination) {
+        this.tempDestination = tempDestination;
+    }
+    public Context getContext() {
+        if (mContext == null){
+            mContext = MyApplication.getContext();
+        }
+        return mContext;
+    }
+
+    private Context mContext;
     public void setFormatAddress(String formatAddress) {
         this.formatAddress = formatAddress;
     }
@@ -70,8 +91,10 @@ public enum Data {
         this.userId = userId;
         if (userId == null){
             SPUtils.instance.remove(USER_ID_KEY);
+            JPushInterface.deleteAlias(getContext(),10036);
         }else {
             SPUtils.instance.put(USER_ID_KEY, userId);
+            JPushInterface.setAlias(getContext(),10036,userId);
         }
     }
     public String getUserId(){

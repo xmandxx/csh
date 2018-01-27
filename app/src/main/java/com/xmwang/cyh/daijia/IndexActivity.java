@@ -65,7 +65,7 @@ import retrofit2.Response;
  * Created by xmwang on 2017/12/19.
  */
 
-public class IndexActivity extends BaseActivity implements OnMyLocationChangeListener,OnCameraChangeListener,GeocodeSearch.OnGeocodeSearchListener {
+public class IndexActivity extends BaseActivity implements OnMyLocationChangeListener, OnCameraChangeListener, GeocodeSearch.OnGeocodeSearchListener {
 
     @BindView(R.id.title_text)
     TextView titleText;
@@ -96,6 +96,7 @@ public class IndexActivity extends BaseActivity implements OnMyLocationChangeLis
     Marker marker;
     GeocodeSearch geocoderSearch;
     Location currLocation;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -112,7 +113,7 @@ public class IndexActivity extends BaseActivity implements OnMyLocationChangeLis
                     @Override
                     public void onSucceed(int requestCode, List<String> grantedPermissions) {
                         // Successfully.
-                        if(requestCode == 200) {
+                        if (requestCode == 200) {
                             init();
                         }
                     }
@@ -120,7 +121,7 @@ public class IndexActivity extends BaseActivity implements OnMyLocationChangeLis
                     @Override
                     public void onFailed(int requestCode, List<String> deniedPermissions) {
                         // Failure.
-                        if(requestCode == 200) {
+                        if (requestCode == 200) {
                             // TODO ...
                         }
                     }
@@ -128,6 +129,7 @@ public class IndexActivity extends BaseActivity implements OnMyLocationChangeLis
                 .start();
 
     }
+
     @Override
     public void onBackPressed() {
 //        自己处理返回按键的内容
@@ -158,6 +160,7 @@ public class IndexActivity extends BaseActivity implements OnMyLocationChangeLis
             ToastUtils.getInstance().toastShow("再按一次退出程序");
         }
     }
+
     private void init() {
         //注册事件
         EventBus.getDefault().register(this);
@@ -181,7 +184,7 @@ public class IndexActivity extends BaseActivity implements OnMyLocationChangeLis
 
         //初始化定位蓝点样式类myLocationStyle.myLocationType(MyLocationStyle.LOCATION_TYPE_LOCATION_ROTATE);
         //连续定位、且将视角移动到地图中心点，定位点依照设备方向旋转，并且会跟随设备移动。（1秒1次定位）如果不设置myLocationType，默认也会执行此种模式。
-        if(myLocationStyle ==null) {
+        if (myLocationStyle == null) {
             myLocationStyle = new MyLocationStyle();
         }
         myLocationStyle.showMyLocation(true);  //隐藏定位蓝点
@@ -197,11 +200,10 @@ public class IndexActivity extends BaseActivity implements OnMyLocationChangeLis
         aMap.setOnMyLocationChangeListener(this);
 
 
-
         marker = aMap.addMarker(new MarkerOptions());
 
         //逆地理
-        if (geocoderSearch == null){
+        if (geocoderSearch == null) {
             geocoderSearch = new GeocodeSearch(this);
         }
         geocoderSearch.setOnGeocodeSearchListener(this);
@@ -211,21 +213,22 @@ public class IndexActivity extends BaseActivity implements OnMyLocationChangeLis
     public void onDataSynEvent(final UserDriverInfoEvent event) {
         loadNetworkData();
     }
-    private void loadNetworkData(){
+
+    private void loadNetworkData() {
         Call<DriveInfo> call = RetrofitHelper.instance.getApiService().driveInfo(Data.instance.AdminId, Data.instance.getUserId());
         call.enqueue(new Callback<DriveInfo>() {
             @Override
             public void onResponse(Call<DriveInfo> call, Response<DriveInfo> response) {
                 DriveInfo driveInfo = response.body();
-                if (driveInfo != null){
-                    if (driveInfo.getData().size() > 0){
+                if (driveInfo != null) {
+                    if (driveInfo.getData().size() > 0) {
                         Data.instance.setDriveInfo(driveInfo.getData().get(0));
                         txtMoney.setText(Data.instance.getDriveInfo().getDriver_money());
                         txtDayMoney.setText(Data.instance.getDriveInfo().getDay_get_money());
                         txtOrderNumber.setText(Data.instance.getDriveInfo().getDay_order_count());
-                        if (driveInfo.getData().get(0).getDriver_status() == 2){
+                        if (driveInfo.getData().get(0).getDriver_status() == 2) {
                             Data.instance.setOnline(false);
-                        }else{
+                        } else {
                             Data.instance.setOnline(true);
                         }
                     }
@@ -240,13 +243,13 @@ public class IndexActivity extends BaseActivity implements OnMyLocationChangeLis
         });
     }
 
-    @OnClick({R.id.start_location, R.id.end_location,R.id.btn_online, R.id.add_order, R.id.edit_parment,R.id.title_right})
+    @OnClick({R.id.start_location, R.id.end_location, R.id.btn_online, R.id.add_order, R.id.edit_parment, R.id.title_right})
     public void onViewClicked(View view) {
         switch (view.getId()) {
             case R.id.start_location:
                 break;
             case R.id.end_location:
-                startActivity(new Intent(this,ChooseLocationActivity.class));
+                startActivityForResult(new Intent(this, ChooseLocationActivity.class), 200);
                 break;
             case R.id.btn_online:
                 Data.instance.setOnline(!Data.instance.getIsOnline());
@@ -254,11 +257,11 @@ public class IndexActivity extends BaseActivity implements OnMyLocationChangeLis
                 break;
             case R.id.add_order:
                 //创建订单
-                if (!Data.instance.getIsOnline()){
-                     ToastUtils.getInstance().toastShow("请先上线");
-                     return;
+                if (!Data.instance.getIsOnline()) {
+                    ToastUtils.getInstance().toastShow("请先上线");
+                    return;
                 }
-                startActivity(new Intent(this,CreateDJOrderActivity.class));
+                startActivity(new Intent(this, CreateDJOrderActivity.class));
                 break;
             case R.id.edit_parment:
                 //编辑参数
@@ -270,7 +273,26 @@ public class IndexActivity extends BaseActivity implements OnMyLocationChangeLis
         }
     }
 
-    private void online(){
+    // 为了获取结果
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        // RESULT_OK，判断另外一个activity已经结束数据输入功能，Standard activity result:
+        // operation succeeded. 默认值是-1
+        if (resultCode == 200) {
+            if (requestCode == 200) {
+                String destination = data.getStringExtra("destination");
+                if (destination != null){
+                    endLocation.setText(destination);
+                    Data.instance.setTempDestination(destination);
+                }
+                //设置结果显示框的显示数值
+//              result.setText(String.valueOf(three));
+            }
+        }
+    }
+
+    private void online() {
         SADialog.instance.showProgress(this);
         String ds = Data.instance.getIsOnline() ? "0" : "2";
         Call<BaseModel> call = RetrofitHelper.instance.getApiService().online(
@@ -289,10 +311,10 @@ public class IndexActivity extends BaseActivity implements OnMyLocationChangeLis
                     ToastUtils.getInstance().toastShow(baseModel.getMessage());
                     return;
                 }
-                if (Data.instance.getIsOnline()){
+                if (Data.instance.getIsOnline()) {
                     btnOnline.setText("点击离线");
                     btnOnline.setBackgroundColor(Color.parseColor("#98FB98"));
-                }else{
+                } else {
                     btnOnline.setText("点击上线");
                     btnOnline.setBackgroundColor(Color.parseColor("#B0C4DE"));
                 }
@@ -330,16 +352,18 @@ public class IndexActivity extends BaseActivity implements OnMyLocationChangeLis
         }
         return mMonth + "月" + mDay + "日" + " 星期" + mWay;
     }
+
     //反地理编码
-    private void regeocodeQuery(double latitude,double longitude){
-        LatLonPoint point = new LatLonPoint(latitude,longitude);
-        RegeocodeQuery query = new RegeocodeQuery(point, 200,GeocodeSearch.AMAP);
+    private void regeocodeQuery(double latitude, double longitude) {
+        LatLonPoint point = new LatLonPoint(latitude, longitude);
+        RegeocodeQuery query = new RegeocodeQuery(point, 200, GeocodeSearch.AMAP);
         geocoderSearch.getFromLocationAsyn(query);
     }
+
     @Override
     public void onMyLocationChange(Location location) {
         // 定位回调监听
-        if(location != null) {
+        if (location != null) {
             //设置希望展示的地图缩放级别
             CameraUpdate mCameraUpdate = CameraUpdateFactory.zoomTo(15);
             aMap.animateCamera(mCameraUpdate);
@@ -347,7 +371,7 @@ public class IndexActivity extends BaseActivity implements OnMyLocationChangeLis
             Data.instance.setLocation(location);
             Log.e("amap", "onMyLocationChange 定位成功， lat: " + location.getLatitude() + " lon: " + location.getLongitude());
             Bundle bundle = location.getExtras();
-            if(bundle != null) {
+            if (bundle != null) {
                 int errorCode = bundle.getInt(MyLocationStyle.ERROR_CODE);
                 String errorInfo = bundle.getString(MyLocationStyle.ERROR_INFO);
                 // 定位类型，可能为GPS WIFI等，具体可以参考官网的定位SDK介绍
@@ -359,17 +383,17 @@ public class IndexActivity extends BaseActivity implements OnMyLocationChangeLis
                 locationType
                 */
 //                Log.e("amap", "定位信息， code: " + errorCode + " errorInfo: " + errorInfo + " locationType: " + locationType );
-                if (errorCode > 0){
-                    Toast.makeText(this,"定位失败，请打开定位权限",Toast.LENGTH_SHORT).show();
+                if (errorCode > 0) {
+                    Toast.makeText(this, "定位失败，请打开定位权限", Toast.LENGTH_SHORT).show();
                 }
-                regeocodeQuery(location.getLatitude(),location.getLongitude());
-                LatLng latLng = new LatLng(location.getLatitude(),location.getLongitude());
+                regeocodeQuery(location.getLatitude(), location.getLongitude());
+                LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
                 marker.setPosition(latLng);
                 //判定第一次加载 在线数据
-                if (currLocation == null){
+                if (currLocation == null) {
                     currLocation = location;
                     loadNetworkData();
-                    new Handler().postDelayed(new Runnable(){
+                    new Handler().postDelayed(new Runnable() {
                         public void run() {
                             aMap.setOnCameraChangeListener(IndexActivity.this);
                         }
@@ -383,27 +407,26 @@ public class IndexActivity extends BaseActivity implements OnMyLocationChangeLis
 
         } else {
             Log.e("amap", "定位失败");
-            Toast.makeText(this,"定位失败",Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "定位失败", Toast.LENGTH_SHORT).show();
         }
 
     }
 
     @Override
     public void onCameraChange(CameraPosition cameraPosition) {
-        regeocodeQuery(cameraPosition.target.latitude,cameraPosition.target.longitude);
-        marker.setPosition(cameraPosition.target);
+
     }
 
     @Override
-    public void onCameraChangeFinish(CameraPosition position){
-
-
+    public void onCameraChangeFinish(CameraPosition cameraPosition) {
+        regeocodeQuery(cameraPosition.target.latitude, cameraPosition.target.longitude);
+        marker.setPosition(cameraPosition.target);
     }
 
     @Override
     public void onRegeocodeSearched(RegeocodeResult result, int rCode) {
         //解析result获取地址描述信息
-        Log.e("amap", "逆地理编码："+result.getRegeocodeAddress().getFormatAddress());
+        Log.e("amap", "逆地理编码：" + result.getRegeocodeAddress().getFormatAddress());
         startLocation.setText(result.getRegeocodeAddress().getFormatAddress());
         Data.instance.setFormatAddress(result.getRegeocodeAddress().getFormatAddress());
     }

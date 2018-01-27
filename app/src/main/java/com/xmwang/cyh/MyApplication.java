@@ -6,6 +6,8 @@ import android.content.Intent;
 
 import com.xmwang.cyh.common.Data;
 
+import cn.jpush.android.api.JPushInterface;
+
 /**
  * @Description: MyApplication
  * @author: CTS
@@ -37,6 +39,9 @@ public class MyApplication extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
+        //极光
+        JPushInterface.setDebugMode(true);
+        JPushInterface.init(this);
         mcontext = this;
         instances = this;
         //刷新用户数据

@@ -1,6 +1,9 @@
 package com.xmwang.cyh.daijia;
 
+import android.annotation.SuppressLint;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
@@ -9,13 +12,16 @@ import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
 
+import com.alipay.sdk.app.PayTask;
 import com.tencent.mm.opensdk.modelpay.PayReq;
 import com.tencent.mm.opensdk.openapi.IWXAPI;
 import com.tencent.mm.opensdk.openapi.WXAPIFactory;
 import com.xmwang.cyh.R;
 import com.xmwang.cyh.common.Data;
+import com.xmwang.cyh.common.PayResult;
 import com.xmwang.cyh.common.RetrofitHelper;
 import com.xmwang.cyh.common.event.UserDriverInfoEvent;
+import com.xmwang.cyh.model.AlipayModel;
 import com.xmwang.cyh.model.DriveInfo;
 import com.xmwang.cyh.model.WXPayModel;
 import com.xmwang.cyh.utils.ToastUtils;
@@ -23,6 +29,10 @@ import com.xmwang.cyh.utils.ToastUtils;
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
+
+import java.util.Map;
+
+import javax.xml.transform.Result;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -46,6 +56,8 @@ public class AccActivity extends AppCompatActivity implements RadioGroup.OnCheck
     String money = "500";
     int moneyType = 1; //1微信2支付宝
     IWXAPI msgApi;
+    PayReq request = new PayReq();
+    private String order_no;//存储支付订单号
     private boolean isChangeGroup = false;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -182,8 +194,67 @@ public class AccActivity extends AppCompatActivity implements RadioGroup.OnCheck
     }
 
     private void aliPay() {
+        RetrofitHelper.instance.getApiPayService().alipay_pay(
+                Data.instance.AdminId,
+                Data.instance.getUserId(),
+                2,
+                money
+        ).enqueue(new Callback<AlipayModel>() {
+            @Override
+            public void onResponse(retrofit2.Call<AlipayModel> call, Response<AlipayModel> response) {
+                AlipayModel model = response.body();
+                if (model == null){
+                    return;
+                }
+                if (model.getCode() != RetrofitHelper.instance.SUCCESS_CODE || model.getData().size() == 0) {
+                    return;
+                }
+                final AlipayModel.DataBean m = model.getData().get(0);
+                Runnable payRunnable = new Runnable() {
+                    @Override
+                    public void run() {
+                        PayTask alipay = new PayTask(AccActivity.this);
+                        Map<String, String> result = alipay.payV2(m.getOrderstr(),true);
 
+                        Message msg = new Message();
+                        msg.what = 1;
+                        msg.obj = result;
+                        mHandler.sendMessage(msg);
+                    }
+                };
+                // 必须异步调用
+                Thread payThread = new Thread(payRunnable);
+                payThread.start();
+//                PayReq request = new PayReq();
+//                request.appId = Data.instance.WXKEY;
+//                request.partnerId = m.getPartnerid();
+//                request.prepayId = m.getPrepayid();
+//                request.packageValue = "Sign=WXPay";
+//                request.nonceStr = m.getNoncestr();
+//                request.timeStamp = String.valueOf(m.getTimestamp());
+//                request.sign = m.getSign();
+//                msgApi.sendReq(request);
+            }
+
+            @Override
+            public void onFailure(retrofit2.Call<AlipayModel> call, Throwable t) {
+
+            }
+        });
     }
+
+    @SuppressLint("HandlerLeak")
+    private Handler mHandler = new Handler() {
+        @SuppressWarnings("unused")
+        public void handleMessage(Message msg) {
+            @SuppressWarnings("unchecked")
+            PayResult payResult = new PayResult((Map<String, String>) msg.obj);
+
+            ToastUtils.getInstance().toastShow(payResult.getResult());
+//            Toast.makeText(DemoActivity.this, result.getResult(),
+//                    Toast.LENGTH_LONG).show();
+        };
+    };
 
     private void setMoneyType(int mt){
         moneyType = mt;

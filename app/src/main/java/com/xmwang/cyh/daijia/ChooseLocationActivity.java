@@ -1,16 +1,23 @@
 package com.xmwang.cyh.daijia;
 
+import android.content.Context;
+import android.content.Intent;
 import android.location.Location;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
+import android.widget.BaseAdapter;
 import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.amap.api.maps.AMap;
@@ -24,6 +31,7 @@ import com.amap.api.maps.model.LatLng;
 import com.amap.api.maps.model.Marker;
 import com.amap.api.maps.model.MarkerOptions;
 import com.amap.api.maps.model.MyLocationStyle;
+import com.amap.api.services.core.AMapException;
 import com.amap.api.services.core.LatLonPoint;
 import com.amap.api.services.core.PoiItem;
 import com.amap.api.services.geocoder.GeocodeResult;
@@ -42,6 +50,9 @@ import com.jude.easyrecyclerview.decoration.DividerDecoration;
 import com.xmwang.cyh.BaseActivity;
 import com.xmwang.cyh.R;
 import com.xmwang.cyh.common.Data;
+import com.xmwang.cyh.common.amap.InputTipTask;
+import com.xmwang.cyh.common.amap.LocationBean;
+import com.xmwang.cyh.utils.ToastUtils;
 import com.xmwang.cyh.viewholder.ChooseLocationHolder;
 
 import java.util.ArrayList;
@@ -50,15 +61,17 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import butterknife.OnTextChanged;
 
-public class ChooseLocationActivity extends BaseActivity implements AMap.OnMyLocationChangeListener, AMap.OnCameraChangeListener, GeocodeSearch.OnGeocodeSearchListener, Inputtips.InputtipsListener, PoiSearch.OnPoiSearchListener,AdapterView.OnItemClickListener {
+public class ChooseLocationActivity extends BaseActivity implements AMap.OnMyLocationChangeListener, AMap.OnCameraChangeListener, GeocodeSearch.OnGeocodeSearchListener, PoiSearch.OnPoiSearchListener,AdapterView.OnItemClickListener, TextWatcher {
 
     @BindView(R.id.title_text)
-    EditText titleText;
+    AutoCompleteTextView titleText;
     @BindView(R.id.map)
     MapView mapView;
     @BindView(R.id.erv_list)
     EasyRecyclerView ervList;
+    private ArrayAdapter<String> textArrayAdapter;
     private RecyclerArrayAdapter<PoiItem> adapter;
     AMap aMap;
     MyLocationStyle myLocationStyle;
@@ -109,6 +122,14 @@ public class ChooseLocationActivity extends BaseActivity implements AMap.OnMyLoc
                 return new ChooseLocationHolder(parent);
             }
         });
+        adapter.setOnItemClickListener(new RecyclerArrayAdapter.OnItemClickListener() {
+            @Override
+            public void onItemClick(int position, View view) {
+                if (poiItems != null){
+                    goBack(poiItems.get(position).getSnippet());
+                }
+            }
+        });
 
 
         //2.初始化地图控制器对象
@@ -146,6 +167,10 @@ public class ChooseLocationActivity extends BaseActivity implements AMap.OnMyLoc
         }
         geocoderSearch.setOnGeocodeSearchListener(this);
 
+        //3.
+        titleText.addTextChangedListener(this);
+        titleText.setOnItemClickListener(this);
+
     }
 
 
@@ -154,6 +179,15 @@ public class ChooseLocationActivity extends BaseActivity implements AMap.OnMyLoc
         LatLonPoint point = new LatLonPoint(latitude, longitude);
         RegeocodeQuery query = new RegeocodeQuery(point, 200, GeocodeSearch.AMAP);
         geocoderSearch.getFromLocationAsyn(query);
+    }
+
+    private void goBack(String destination){
+        Intent intent = new Intent();
+        intent.putExtra("destination", destination);
+        //通过intent对象返回结果，必须要调用一个setResult方法，
+        //setResult(resultCode, data);第一个参数表示结果返回码，一般只要大于1就可以，但是
+        setResult(200, intent);
+        finish();
     }
 
     @Override
@@ -192,16 +226,18 @@ public class ChooseLocationActivity extends BaseActivity implements AMap.OnMyLoc
 
     }
 
+    /**正在移动地图事件回调*/
     @Override
     public void onCameraChange(CameraPosition cameraPosition) {
+
+    }
+
+    /** 移动地图结束事件的回调*/
+    @Override
+    public void onCameraChangeFinish(CameraPosition cameraPosition) {
         currLocation = cameraPosition.target;
         regeocodeQuery(cameraPosition.target.latitude, cameraPosition.target.longitude);
         marker.setPosition(cameraPosition.target);
-    }
-
-    @Override
-    public void onCameraChangeFinish(CameraPosition position) {
-
 
     }
 
@@ -228,7 +264,6 @@ public class ChooseLocationActivity extends BaseActivity implements AMap.OnMyLoc
     private PoiSearch.Query query;// Poi查询条件类
     private PoiResult poiResult; // poi返回的结果
     private List<PoiItem> poiItems;// poi数据
-
     /**
      * 获取周边信息
      */
@@ -250,7 +285,7 @@ public class ChooseLocationActivity extends BaseActivity implements AMap.OnMyLoc
     @Override
     public void onPoiSearched(PoiResult poiResult, int rCode) {
         Log.e("xmwang","onPoiSearched");
-        List<PoiItem> poiItems = poiResult.getPois();
+        poiItems = poiResult.getPois();
         adapter.clear();
         adapter.addAll(poiResult.getPois());
     }
@@ -260,22 +295,30 @@ public class ChooseLocationActivity extends BaseActivity implements AMap.OnMyLoc
         Log.e("xmwang","onPoiItemSearched");
     }
 
-    //输入内容自动提示
-    private void bindText(String newText){
-        InputtipsQuery inputquery = new InputtipsQuery(newText, city);
-        inputquery.setCityLimit(true);
-        Inputtips inputTips = new Inputtips(this, inputquery);
-        inputTips.setInputtipsListener(this);
-        inputTips.requestInputtipsAsyn();
+    //3.输入自动提示
+    @Override
+    public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+    }
+
+    @Override
+    public void onTextChanged(CharSequence s, int start, int before, int count) {
+        //高德地图的输入的自动提示
+        InputTipTask.getInstance(this).setAdapter(titleText).searchTips(s.toString().trim(), city);
+
     }
     @Override
-    public void onGetInputtips(List<Tip> list, int rCode) {
-        Log.e("xmwang","onGetInputtips");
+    public void afterTextChanged(Editable s) {
+
     }
 
     @Override
     public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
         Log.e("xmwang","onItemClick");
+        List<LocationBean> locationBeans = InputTipTask.getInstance(this).getBean();
+        if (locationBeans.size() > 0){
+            goBack(locationBeans.get(i).getContent());
+        }
     }
 
     @Override

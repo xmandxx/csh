@@ -23,6 +23,28 @@
             ]
         },
         {
+            "outputFile": "/Developer/Android/csh/sweet_alert_dialog_library/build/intermediates/incremental/mergeDebugAndroidTestResources/merged.dir/values-port/values-port.xml",
+            "map": [
+                {
+                    "source": "/Users/xw/.gradle/caches/transforms-1/files-1.1/appcompat-v7-21.0.0.aar/289f3586624ec6c683f5ff336100a2c2/res/values-port/values.xml",
+                    "from": {
+                        "startLines": "3",
+                        "startColumns": "4",
+                        "startOffsets": "56",
+                        "endColumns": "55",
+                        "endOffsets": "107"
+                    },
+                    "to": {
+                        "startLines": "2",
+                        "startColumns": "4",
+                        "startOffsets": "55",
+                        "endColumns": "55",
+                        "endOffsets": "106"
+                    }
+                }
+            ]
+        },
+        {
             "outputFile": "/Developer/Android/csh377/sweet_alert_dialog_library/build/intermediates/incremental/mergeDebugAndroidTestResources/merged.dir/values-port/values-port.xml",
             "map": [
                 {

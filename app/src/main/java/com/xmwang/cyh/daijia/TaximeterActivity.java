@@ -79,7 +79,7 @@ public class TaximeterActivity extends BaseActivity implements OnConfirmListener
     int secondsCountDown = 0;
     double sumMoney = 0;
     double waitMoney = 0;
-    private String destination;
+    private String destination = Data.instance.getFormatAddress();//传递给数据
     GeocodeSearch geocoderSearch;
     LBSTraceClient lbsTraceClient;
     PowerManager.WakeLock m_wklk;
@@ -105,6 +105,7 @@ public class TaximeterActivity extends BaseActivity implements OnConfirmListener
     public void onViewClicked(View view) {
         switch (view.getId()) {
             case R.id.end_location:
+                startActivityForResult(new Intent(this, ChooseLocationActivity.class), 200);
                 break;
             case R.id.btn_wait:
                 MyDialog.show(this, "您确定要" + btnWait.getText(),this);
@@ -122,6 +123,24 @@ public class TaximeterActivity extends BaseActivity implements OnConfirmListener
                     }
                 });
                 break;
+        }
+    }
+    // 为了获取结果
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        // RESULT_OK，判断另外一个activity已经结束数据输入功能，Standard activity result:
+        // operation succeeded. 默认值是-1
+        if (resultCode == 200) {
+            if (requestCode == 200) {
+                String destination = data.getStringExtra("destination");
+                if (destination != null){
+                    endLocation.setText(destination);
+                    Data.instance.setTempDestination(destination);
+                }
+                //设置结果显示框的显示数值
+//              result.setText(String.valueOf(three));
+            }
         }
     }
 
@@ -160,6 +179,9 @@ public class TaximeterActivity extends BaseActivity implements OnConfirmListener
     }
 
     private void init(){
+        if (Data.instance.getTempDestination() != null){
+            endLocation.setText(Data.instance.getTempDestination());
+        }
         PowerManager pm = (PowerManager)getSystemService(POWER_SERVICE);
         m_wklk = pm.newWakeLock(PowerManager.SCREEN_DIM_WAKE_LOCK, "cn");
         m_wklk.acquire(); //设置保持唤醒
