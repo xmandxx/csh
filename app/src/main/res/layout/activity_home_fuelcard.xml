@@ -36,35 +36,35 @@
         android:layout_height="match_parent"
         android:orientation="vertical"
         android:background="@color/backgroundColor">
+        <!--<LinearLayout-->
+            <!--android:orientation="vertical"-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="60dp"-->
+            <!--android:layout_marginTop="5dp"-->
+            <!--android:paddingLeft="10dp"-->
+            <!--android:paddingRight="10dp"-->
+            <!--android:background="@color/whiteColor">-->
+            <!--<TextView-->
+                <!--android:layout_width="wrap_content"-->
+                <!--android:layout_height="wrap_content"-->
+                <!--android:textColor="@color/darkgrey"-->
+                <!--android:text="持卡人手机号："/>-->
+            <!--<EditText-->
+                <!--android:id="@+id/txt_phone"-->
+                <!--android:layout_width="match_parent"-->
+                <!--android:layout_height="0dp"-->
+                <!--android:layout_weight="1"-->
+                <!--android:textSize="@dimen/text_14"-->
+                <!--android:textColor="@color/blackColor"-->
+                <!--android:hint=""-->
+                <!--android:background="@null"-->
+                <!--android:inputType="phone"/>-->
+        <!--</LinearLayout>-->
         <LinearLayout
             android:orientation="vertical"
             android:layout_width="match_parent"
             android:layout_height="60dp"
-            android:layout_marginTop="5dp"
-            android:paddingLeft="10dp"
-            android:paddingRight="10dp"
-            android:background="@color/whiteColor">
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textColor="@color/darkgrey"
-                android:text="持卡人手机号："/>
-            <EditText
-                android:id="@+id/txt_phone"
-                android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_weight="1"
-                android:textSize="@dimen/text_14"
-                android:textColor="@color/blackColor"
-                android:hint=""
-                android:background="@null"
-                android:inputType="phone"/>
-        </LinearLayout>
-        <LinearLayout
-            android:orientation="vertical"
-            android:layout_width="match_parent"
-            android:layout_height="60dp"
-            android:layout_marginTop="1px"
+            android:layout_marginTop="10px"
             android:paddingLeft="10dp"
             android:paddingRight="10dp"
             android:background="@color/whiteColor">

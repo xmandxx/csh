@@ -98,7 +98,7 @@ public interface ApiHomeService {
     @POST("home/fuelcard")
     Call<BaseModel> fuelcard(@Field("admin_id") String admin_id,
                              @Field("user_id") String user_id,
-                             @Field("phone") String phone,
+//                             @Field("phone") String phone,
                              @Field("car_number") String car_number,
                              @Field("original_price") String original_price,
                              @Field("allmoney") String allmoney

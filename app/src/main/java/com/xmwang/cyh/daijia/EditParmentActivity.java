@@ -152,6 +152,10 @@ public class EditParmentActivity extends BaseActivity implements RadioGroup.OnCh
                     ToastUtils.getInstance().toastShow("请先上线");
                     return;
                 }
+                if (Double.valueOf(Data.instance.getDriveInfo().getDriver_money()) < Data.instance.getDriveInfo().getDriver_min_money()){
+                    ToastUtils.getInstance().toastShow("余额不足，接单最低需要"+Data.instance.getDriveInfo().getDriver_min_money()+"元");
+                    return;
+                }
                 startActivity(new Intent(this, CreateDJOrderActivity.class));
                 break;
         }

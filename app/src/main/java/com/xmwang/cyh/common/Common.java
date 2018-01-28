@@ -1,6 +1,8 @@
 package com.xmwang.cyh.common;
 
 import android.content.Context;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.util.TypedValue;
 import android.view.WindowManager;
 
@@ -19,6 +21,20 @@ public class Common {
     public static String baseUrl = "http://api.itopv.com/base/api/";
     public static String adminId = "1";
     public static String amapKey = "fdd0670eb8a61e9920b280b6fe1f21b8";
+    public static boolean jpushIsEmpty(String s) {
+        if (null == s)
+            return true;
+        if (s.length() == 0)
+            return true;
+        if (s.trim().length() == 0)
+            return true;
+        return false;
+    }
+    public static boolean isConnected(Context context) {
+        ConnectivityManager conn = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo info = conn.getActiveNetworkInfo();
+        return (info != null && info.isConnected());
+    }
     public static boolean isEmpty(String str){
         if (str == null){
             return true;

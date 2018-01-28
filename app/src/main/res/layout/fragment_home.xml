@@ -164,7 +164,7 @@
                         xmlns:app="http://schemas.android.com/apk/res-auto"
                         android:id="@+id/convenientBanner"
                         android:layout_width="match_parent"
-                        android:layout_height="180dp"
+                        android:layout_height="100dp"
                         app:canLoop="true"/>
                     <com.jude.easyrecyclerview.EasyRecyclerView
                         android:id="@+id/erv_menu"

@@ -105,7 +105,6 @@ public class IndexActivity extends BaseActivity implements OnMyLocationChangeLis
 
         //在activity执行onCreate时执行mMapView.onCreate(savedInstanceState)，创建地图
         mapView.onCreate(savedInstanceState);
-
         AndPermission.with(this)
                 .requestCode(200)
                 .permission(Permission.LOCATION)
@@ -198,7 +197,8 @@ public class IndexActivity extends BaseActivity implements OnMyLocationChangeLis
         aMap.setMyLocationStyle(myLocationStyle);
         //设置定位监听
         aMap.setOnMyLocationChangeListener(this);
-
+        //设置移动屏幕监听
+        aMap.setOnCameraChangeListener(IndexActivity.this);
 
         marker = aMap.addMarker(new MarkerOptions());
 
@@ -243,12 +243,12 @@ public class IndexActivity extends BaseActivity implements OnMyLocationChangeLis
         });
     }
 
-    @OnClick({R.id.start_location, R.id.end_location, R.id.btn_online, R.id.add_order, R.id.edit_parment, R.id.title_right})
+    @OnClick({R.id.start_location, R.id.ll_end_location, R.id.btn_online, R.id.add_order, R.id.edit_parment, R.id.title_right})
     public void onViewClicked(View view) {
         switch (view.getId()) {
             case R.id.start_location:
                 break;
-            case R.id.end_location:
+            case R.id.ll_end_location:
                 startActivityForResult(new Intent(this, ChooseLocationActivity.class), 200);
                 break;
             case R.id.btn_online:
@@ -259,6 +259,10 @@ public class IndexActivity extends BaseActivity implements OnMyLocationChangeLis
                 //创建订单
                 if (!Data.instance.getIsOnline()) {
                     ToastUtils.getInstance().toastShow("请先上线");
+                    return;
+                }
+                if (Double.valueOf(Data.instance.getDriveInfo().getDriver_money()) < Data.instance.getDriveInfo().getDriver_min_money()){
+                    ToastUtils.getInstance().toastShow("余额不足，接单最低需要"+Data.instance.getDriveInfo().getDriver_min_money()+"元");
                     return;
                 }
                 startActivity(new Intent(this, CreateDJOrderActivity.class));
@@ -365,8 +369,8 @@ public class IndexActivity extends BaseActivity implements OnMyLocationChangeLis
         // 定位回调监听
         if (location != null) {
             //设置希望展示的地图缩放级别
-            CameraUpdate mCameraUpdate = CameraUpdateFactory.zoomTo(15);
-            aMap.animateCamera(mCameraUpdate);
+//            CameraUpdate mCameraUpdate = CameraUpdateFactory.zoomTo(15);
+//            aMap.animateCamera(mCameraUpdate);
 
             Data.instance.setLocation(location);
             Log.e("amap", "onMyLocationChange 定位成功， lat: " + location.getLatitude() + " lon: " + location.getLongitude());
@@ -384,21 +388,13 @@ public class IndexActivity extends BaseActivity implements OnMyLocationChangeLis
                 */
 //                Log.e("amap", "定位信息， code: " + errorCode + " errorInfo: " + errorInfo + " locationType: " + locationType );
                 if (errorCode > 0) {
-                    Toast.makeText(this, "定位失败，请打开定位权限", Toast.LENGTH_SHORT).show();
+                    ToastUtils.getInstance().toastShow("定位失败，请打开定位权限");
                 }
                 regeocodeQuery(location.getLatitude(), location.getLongitude());
                 LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
                 marker.setPosition(latLng);
-                //判定第一次加载 在线数据
-                if (currLocation == null) {
-                    currLocation = location;
-                    loadNetworkData();
-                    new Handler().postDelayed(new Runnable() {
-                        public void run() {
-                            aMap.setOnCameraChangeListener(IndexActivity.this);
-                        }
-                    }, 2000);
-                }
+                currLocation = location;
+                loadNetworkData();
 
             } else {
                 Log.e("amap", "定位信息， bundle is null ");
@@ -407,7 +403,7 @@ public class IndexActivity extends BaseActivity implements OnMyLocationChangeLis
 
         } else {
             Log.e("amap", "定位失败");
-            Toast.makeText(this, "定位失败", Toast.LENGTH_SHORT).show();
+            ToastUtils.getInstance().toastShow("定位失败");
         }
 
     }

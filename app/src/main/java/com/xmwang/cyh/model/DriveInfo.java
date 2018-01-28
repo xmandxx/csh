@@ -11,7 +11,7 @@ public class DriveInfo {
     /**
      * code : 200
      * message : 获取成功
-     * data : [{"driver_id":9,"job_number":"CK20171109230634","user_id":69,"realname":"小明","sex":1,"phone":"","id_card":"123456","driver_status":0,"face":"","license_time":0,"entry_time":1513136814,"add_time":"2017-11-09 23:06:34","driver_type":0,"body_photo":"/data/driver/20171109/fbefe2e1a635f24e4b2ff5dc58c9b5a3.jpeg","travel_photo":"/data/driver/20171109/e5f5527b7e85c7e44e65e081742db591.jpeg","drive_photo":"/data/driver/20171109/5cb3e28fde423b68f95778778b2032e2.jpeg","idcard_photo":"/data/driver/20171109/bd336105136cf4c5ec18b72223e8cd88.jpeg","car_number":"豫A88888","licensetype":"","address":"","introducer":"","urgent_name":"","urgent_phone":"","msg":"","status":1,"longitude":"0.0000000","latitude":"0.0000000","point_time":0,"service_count":0,"evaluate":"0.0","driver_money":"0.00","charging_id":19,"percentage":"1","day_order_count":0,"day_get_money":0}]
+     * data : [{"driver_id":9,"job_number":"CK20171109230634","user_id":69,"realname":"小明","sex":1,"phone":"","id_card":"123456","driver_status":2,"face":"","license_time":0,"entry_time":1513136814,"add_time":1510239994,"driver_type":0,"body_photo":"/data/driver/20171109/fbefe2e1a635f24e4b2ff5dc58c9b5a3.jpeg","travel_photo":"/data/driver/20171109/e5f5527b7e85c7e44e65e081742db591.jpeg","drive_photo":"/data/driver/20171109/5cb3e28fde423b68f95778778b2032e2.jpeg","idcard_photo":"/data/driver/20171109/bd336105136cf4c5ec18b72223e8cd88.jpeg","car_number":"豫A88888","licensetype":"","address":"","introducer":"","urgent_name":"","urgent_phone":"","msg":"","status":1,"longitude":"113.7386970","latitude":"34.7419400","point_time":1517057162,"service_count":0,"evaluate":"0.0","driver_money":"21750.00","charging_id":19,"percentage":"1.00","user_money":"302.20","driver_min_money":"150.00","line_driver_time":2700,"day_order_count":3,"day_get_money":294}]
      */
 
     private int code;
@@ -51,11 +51,11 @@ public class DriveInfo {
          * sex : 1
          * phone :
          * id_card : 123456
-         * driver_status : 0
+         * driver_status : 2
          * face :
          * license_time : 0
          * entry_time : 1513136814
-         * add_time : 2017-11-09 23:06:34
+         * add_time : 1510239994
          * driver_type : 0
          * body_photo : /data/driver/20171109/fbefe2e1a635f24e4b2ff5dc58c9b5a3.jpeg
          * travel_photo : /data/driver/20171109/e5f5527b7e85c7e44e65e081742db591.jpeg
@@ -69,16 +69,19 @@ public class DriveInfo {
          * urgent_phone :
          * msg :
          * status : 1
-         * longitude : 0.0000000
-         * latitude : 0.0000000
-         * point_time : 0
+         * longitude : 113.7386970
+         * latitude : 34.7419400
+         * point_time : 1517057162
          * service_count : 0
          * evaluate : 0.0
-         * driver_money : 0.00
+         * driver_money : 21750.00
          * charging_id : 19
-         * percentage : 1
-         * day_order_count : 0
-         * day_get_money : 0
+         * percentage : 1.00
+         * user_money : 302.20
+         * driver_min_money : 150.00
+         * line_driver_time : 2700
+         * day_order_count : 3
+         * day_get_money : 294
          */
 
         private int driver_id;
@@ -92,7 +95,7 @@ public class DriveInfo {
         private String face;
         private int license_time;
         private int entry_time;
-        private String add_time;
+        private int add_time;
         private int driver_type;
         private String body_photo;
         private String travel_photo;
@@ -114,6 +117,9 @@ public class DriveInfo {
         private String driver_money;
         private int charging_id;
         private String percentage;
+        private String user_money;
+        private double driver_min_money;
+        private int line_driver_time;
         private String day_order_count;
         private String day_get_money;
 
@@ -205,11 +211,11 @@ public class DriveInfo {
             this.entry_time = entry_time;
         }
 
-        public String getAdd_time() {
+        public int getAdd_time() {
             return add_time;
         }
 
-        public void setAdd_time(String add_time) {
+        public void setAdd_time(int add_time) {
             this.add_time = add_time;
         }
 
@@ -379,6 +385,30 @@ public class DriveInfo {
 
         public void setPercentage(String percentage) {
             this.percentage = percentage;
+        }
+
+        public String getUser_money() {
+            return user_money;
+        }
+
+        public void setUser_money(String user_money) {
+            this.user_money = user_money;
+        }
+
+        public double getDriver_min_money() {
+            return driver_min_money;
+        }
+
+        public void setDriver_min_money(double driver_min_money) {
+            this.driver_min_money = driver_min_money;
+        }
+
+        public int getLine_driver_time() {
+            return line_driver_time;
+        }
+
+        public void setLine_driver_time(int line_driver_time) {
+            this.line_driver_time = line_driver_time;
         }
 
         public String getDay_order_count() {

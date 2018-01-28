@@ -72,14 +72,11 @@ public class TempListActivity extends BaseActivity implements AdapterView.OnItem
 
     }
 
-    @OnClick({R.id.title_back, R.id.title_right})
+    @OnClick({R.id.title_back})
     public void onViewClicked(View view) {
         switch (view.getId()) {
             case R.id.title_back:
                 finish();
-                break;
-            case R.id.title_right:
-                startActivity(new Intent(this, EditTempActivity.class));
                 break;
         }
     }

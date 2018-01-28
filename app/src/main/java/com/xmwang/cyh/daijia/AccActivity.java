@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
@@ -56,7 +57,6 @@ public class AccActivity extends AppCompatActivity implements RadioGroup.OnCheck
     String money = "500";
     int moneyType = 1; //1微信2支付宝
     IWXAPI msgApi;
-    PayReq request = new PayReq();
     private String order_no;//存储支付订单号
     private boolean isChangeGroup = false;
     @Override
@@ -225,15 +225,6 @@ public class AccActivity extends AppCompatActivity implements RadioGroup.OnCheck
                 // 必须异步调用
                 Thread payThread = new Thread(payRunnable);
                 payThread.start();
-//                PayReq request = new PayReq();
-//                request.appId = Data.instance.WXKEY;
-//                request.partnerId = m.getPartnerid();
-//                request.prepayId = m.getPrepayid();
-//                request.packageValue = "Sign=WXPay";
-//                request.nonceStr = m.getNoncestr();
-//                request.timeStamp = String.valueOf(m.getTimestamp());
-//                request.sign = m.getSign();
-//                msgApi.sendReq(request);
             }
 
             @Override
@@ -249,8 +240,19 @@ public class AccActivity extends AppCompatActivity implements RadioGroup.OnCheck
         public void handleMessage(Message msg) {
             @SuppressWarnings("unchecked")
             PayResult payResult = new PayResult((Map<String, String>) msg.obj);
+            Log.e("xmwang",payResult.getResultStatus()+"|"+payResult.getResult());
 
-            ToastUtils.getInstance().toastShow(payResult.getResult());
+// 判断resultStatus 为9000则代表支付成功
+            if (TextUtils.equals(payResult.getResultStatus(), "9000")) {
+                // 该笔订单是否真实支付成功，需要依赖服务端的异步通知。
+                ToastUtils.getInstance().toastShow("支付成功");
+                loadNetword();
+            }else if (TextUtils.equals(payResult.getResultStatus(), "6001")){
+                ToastUtils.getInstance().toastShow("用户取消支付");
+            } else {
+                // 该笔订单真实的支付结果，需要依赖服务端的异步通知。
+                ToastUtils.getInstance().toastShow("支付失败");
+            }
 //            Toast.makeText(DemoActivity.this, result.getResult(),
 //                    Toast.LENGTH_LONG).show();
         };

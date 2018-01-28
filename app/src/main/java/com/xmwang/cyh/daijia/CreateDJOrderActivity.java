@@ -15,6 +15,7 @@ import android.widget.Toast;
 
 import com.xmwang.cyh.BaseActivity;
 import com.xmwang.cyh.R;
+import com.xmwang.cyh.common.Common;
 import com.xmwang.cyh.common.Data;
 import com.xmwang.cyh.common.RetrofitHelper;
 import com.xmwang.cyh.model.OtherDriver;
@@ -98,6 +99,10 @@ public class CreateDJOrderActivity extends BaseActivity {
     }
 
     public void addOrder() {
+        if (!Common.isMobile(txtPhone.getText().toString())){
+            ToastUtils.getInstance().toastShow("请输入正确的手机号");
+            return;
+        }
         Call<OtherDriver> call = RetrofitHelper.instance.getApiService().addDriveOrder(
                 Data.instance.AdminId,
                 txtPhone.getText().toString().trim(),

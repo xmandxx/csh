@@ -36,9 +36,12 @@ import com.xmwang.cyh.common.Data;
 import com.xmwang.cyh.common.MyDialog;
 import com.xmwang.cyh.common.MyDialog.OnConfirmListener;
 import com.xmwang.cyh.common.RetrofitHelper;
+import com.xmwang.cyh.common.event.UserDriverInfoEvent;
 import com.xmwang.cyh.model.BaseModel;
 import com.xmwang.cyh.model.OtherDriver;
 import com.xmwang.cyh.model.TempInfo;
+
+import org.greenrobot.eventbus.EventBus;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
@@ -357,6 +360,7 @@ public class TaximeterActivity extends BaseActivity implements OnConfirmListener
                     Toast.makeText(TaximeterActivity.this, baseModel.getMessage(), Toast.LENGTH_LONG).show();
                     return;
                 }
+                EventBus.getDefault().post(new UserDriverInfoEvent());
                 Intent intent = new Intent(TaximeterActivity.this, OverOrderActivity.class);
                 startActivity(intent);
             }

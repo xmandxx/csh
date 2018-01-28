@@ -26,7 +26,7 @@ public interface ApiPayService {
     Call<WXPayModel>weixin_pay(@Field("admin_id") String admin_id,
                                 @Field("user_id") String user_id,
                                 @Field("order_type") int order_type,
-                                @Field("phone") String phone,
+//                                @Field("phone") String phone,
                                 @Field("car_number") String car_number,
                                 @Field("original_price") String original_price,
                                 @Field("allmoney") String allmoney);
@@ -43,7 +43,7 @@ public interface ApiPayService {
     Call<AlipayModel> alipay_pay(@Field("admin_id") String admin_id,
                                  @Field("user_id") String user_id,
                                  @Field("order_type") int order_type,
-                                 @Field("phone") String phone,
+//                                 @Field("phone") String phone,
                                  @Field("car_number") String car_number,
                                  @Field("original_price") String original_price,
                                  @Field("allmoney") String allmoney);

@@ -93,7 +93,6 @@ public class OverOrderActivity extends BaseActivity {
 
     @OnClick(R.id.btn_go_home)
     public void onViewClicked() {
-        EventBus.getDefault().post(new UserDriverInfoEvent());
         Intent intent = new Intent("com.overorder");
         sendBroadcast(intent);      //发送广播
         this.finish();
