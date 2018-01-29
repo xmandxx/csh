@@ -21,50 +21,6 @@
                     }
                 }
             ]
-        },
-        {
-            "outputFile": "/Developer/android/csh/sweet_alert_dialog_library/build/intermediates/incremental/mergeDebugAndroidTestResources/merged.dir/values-w600dp-v13/values-w600dp-v13.xml",
-            "map": [
-                {
-                    "source": "/Users/wangxiaoming/.gradle/caches/transforms-1/files-1.1/appcompat-v7-21.0.0.aar/c347a801d1ffb52c2ee1009638077692/res/values-w600dp/values.xml",
-                    "from": {
-                        "startLines": "3,5",
-                        "startColumns": "4,4",
-                        "startOffsets": "56,121",
-                        "endColumns": "63,54",
-                        "endOffsets": "115,171"
-                    },
-                    "to": {
-                        "startLines": "2,3",
-                        "startColumns": "4,4",
-                        "startOffsets": "55,119",
-                        "endColumns": "63,54",
-                        "endOffsets": "114,169"
-                    }
-                }
-            ]
-        },
-        {
-            "outputFile": "/Developer/Android/csh377/sweet_alert_dialog_library/build/intermediates/incremental/mergeDebugAndroidTestResources/merged.dir/values-w600dp-v13/values-w600dp-v13.xml",
-            "map": [
-                {
-                    "source": "/Users/xw/.gradle/caches/transforms-1/files-1.1/appcompat-v7-21.0.0.aar/289f3586624ec6c683f5ff336100a2c2/res/values-w600dp/values.xml",
-                    "from": {
-                        "startLines": "3,5",
-                        "startColumns": "4,4",
-                        "startOffsets": "56,121",
-                        "endColumns": "63,54",
-                        "endOffsets": "115,171"
-                    },
-                    "to": {
-                        "startLines": "2,3",
-                        "startColumns": "4,4",
-                        "startOffsets": "55,119",
-                        "endColumns": "63,54",
-                        "endOffsets": "114,169"
-                    }
-                }
-            ]
         }
     ]
 }
