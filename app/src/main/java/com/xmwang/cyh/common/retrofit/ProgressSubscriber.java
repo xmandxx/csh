@@ -25,15 +25,19 @@ public class ProgressSubscriber<T> extends Subscriber<T> implements ProgressCanc
         this.mContext = context;
         mHandler = new ProgressDialogHandler(context, this, true);
     }
+    public ProgressSubscriber(SubscriberOnNextListener<T> listener) {
+        this.mListener = listener;
+        mHandler = new ProgressDialogHandler(this, true);
+    }
 
     private void showProgressDialog() {
-        if (mHandler != null) {
+        if (mHandler != null && mContext != null) {
             mHandler.obtainMessage(ProgressDialogHandler.SHOW_PROGRESS_DIALOG).sendToTarget();
         }
     }
 
     private void dismissProgressDialog() {
-        if (mHandler != null) {
+        if (mHandler != null && mContext != null) {
             mHandler.obtainMessage(ProgressDialogHandler.DISMISS_PROGRESS_DIALOG).sendToTarget();
             mHandler = null;
         }
@@ -47,12 +51,16 @@ public class ProgressSubscriber<T> extends Subscriber<T> implements ProgressCanc
     @Override
     public void onStart() {
         super.onStart();
-        showProgressDialog();
+        if (mContext != null) {
+            showProgressDialog();
+        }
     }
 
     @Override
     public void onCompleted() {
-        dismissProgressDialog();
+        if (mContext != null) {
+            dismissProgressDialog();
+        }
 //        Toast.makeText(MyApplication.getContext(),"获取数据完成！",Toast.LENGTH_SHORT).show();
     }
 
@@ -70,7 +78,9 @@ public class ProgressSubscriber<T> extends Subscriber<T> implements ProgressCanc
             }
 //            Toast.makeText(DemoApplication.getAppContext(), "error:" + e.getMessage(), Toast.LENGTH_SHORT).show();
         }
-        dismissProgressDialog();
+        if (mContext != null) {
+            dismissProgressDialog();
+        }
     }
 
     @Override

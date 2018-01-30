@@ -2,8 +2,7 @@ package com.xmwang.cyh;
 
 import android.app.Application;
 import android.content.Context;
-import android.content.Intent;
-import android.graphics.Color;
+import android.location.Location;
 import android.util.Log;
 
 import com.amap.api.location.AMapLocation;
@@ -12,17 +11,15 @@ import com.amap.api.location.AMapLocationClientOption;
 import com.amap.api.location.AMapLocationListener;
 import com.xmwang.cyh.common.Data;
 import com.xmwang.cyh.common.RetrofitHelper;
-import com.xmwang.cyh.common.RetrofitUtil;
-import com.xmwang.cyh.common.SADialog;
 import com.xmwang.cyh.common.retrofit.BaseResponse;
-import com.xmwang.cyh.common.retrofit.ProgressSubscriber;
+import com.xmwang.cyh.common.retrofit.RetrofitUtil;
 import com.xmwang.cyh.common.retrofit.SubscriberOnNextListener;
 import com.xmwang.cyh.model.BaseModel;
-import com.xmwang.cyh.model.DriveInfo;
 import com.xmwang.cyh.model.DriveInfoModel;
-import com.xmwang.cyh.utils.ToastUtils;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import cn.jpush.android.api.JPushInterface;
 import retrofit2.Call;
@@ -160,27 +157,18 @@ public class MyApplication extends Application implements AMapLocationListener{
                         + amapLocation.getLongitude() + ", getLatitude:"
                         + amapLocation.getLatitude());
                 //可在其中解析amapLocation获取相应内容。
-                RetrofitHelper.instance.getApiService().update_coordinate(
-                        Data.instance.AdminId,
-                        Data.instance.getUserId(),
-                        String.valueOf(amapLocation.getLongitude()),
-                        String.valueOf(amapLocation.getLatitude())
-                ).enqueue(new Callback<BaseModel>() {
+                Map<String,String> param = new HashMap<>();
+                param.put("admin_id",Data.instance.AdminId);
+                param.put("user_id",Data.instance.getUserId());
+                param.put("longitude",amapLocation.getLongitude()+"");
+                param.put("latitude",amapLocation.getLatitude()+"");
+                RetrofitUtil.getInstance().update_coordinate(param,new SubscriberOnNextListener<BaseResponse>() {
                     @Override
-                    public void onResponse(Call<BaseModel> call, Response<BaseModel> response) {
-                        BaseModel baseModel = response.body();
-                        if (baseModel != null){
-                            Log.e("AmapError","update_coordinate:code:"
-                                    + baseModel.getCode());
-                        }
-                    }
-
-                    @Override
-                    public void onFailure(Call<BaseModel> call, Throwable t) {
-
+                    public void onNext(BaseResponse listBaseResponse) {
+                        Log.e("AmapError","update_coordinate:code:"
+                                + listBaseResponse.code);
                     }
                 });
-
             }else {
                 //定位失败时，可通过ErrCode（错误码）信息来确定失败的原因，errInfo是错误信息，详见错误码表。
                 Log.e("AmapError","location Error, ErrCode:"

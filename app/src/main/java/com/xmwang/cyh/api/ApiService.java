@@ -19,6 +19,7 @@ import retrofit2.http.FieldMap;
 import retrofit2.http.FormUrlEncoded;
 import retrofit2.http.POST;
 import retrofit2.http.Path;
+import retrofit2.http.QueryMap;
 import rx.Observable;
 
 /**
@@ -123,8 +124,13 @@ public interface ApiService{
     //更新坐标
     @FormUrlEncoded
     @POST("drive/update_coordinate")
-    Call<BaseModel> update_coordinate(@Field("admin_id") String admin_id,
-                                      @Field("user_id") String user_id,
-                                      @Field("longitude") String longitude,
-                                      @Field("latitude") String latitude);
+    Observable<BaseResponse> update_coordinate(@FieldMap Map<String, String> options);
+//    Observable<BaseResponse> update_coordinate(@Field("admin_id") String admin_id,
+//                                      @Field("user_id") String user_id,
+//                                      @Field("longitude") String longitude,
+//                                      @Field("latitude") String latitude);
+//    Call<BaseModel> update_coordinate(@Field("admin_id") String admin_id,
+//                                      @Field("user_id") String user_id,
+//                                      @Field("longitude") String longitude,
+//                                      @Field("latitude") String latitude);
 }

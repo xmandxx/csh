@@ -4,13 +4,11 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.location.Location;
 import android.os.Bundle;
-import android.os.Handler;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 
 import com.amap.api.maps.AMap;
@@ -35,7 +33,7 @@ import com.xmwang.cyh.MyApplication;
 import com.xmwang.cyh.R;
 import com.xmwang.cyh.common.Data;
 import com.xmwang.cyh.common.RetrofitHelper;
-import com.xmwang.cyh.common.RetrofitUtil;
+import com.xmwang.cyh.common.retrofit.RetrofitUtil;
 import com.xmwang.cyh.common.SADialog;
 import com.xmwang.cyh.common.event.UserDriverInfoEvent;
 import com.xmwang.cyh.common.retrofit.BaseResponse;

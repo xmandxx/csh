@@ -30,9 +30,15 @@ public class ProgressDialogHandler extends Handler {
         this.mProgressCancelListener = mProgressCancelListener;
         this.cancelable = cancelable;
     }
+    public ProgressDialogHandler(ProgressCancelListener mProgressCancelListener,
+                                 boolean cancelable) {
+        super();
+        this.mProgressCancelListener = mProgressCancelListener;
+        this.cancelable = cancelable;
+    }
 
     private void initProgressDialog() {
-        if (pd == null) {
+        if (pd == null && context != null) {
             pd = new ProgressDialog(context);
 
             pd.setCancelable(cancelable);
@@ -53,7 +59,7 @@ public class ProgressDialogHandler extends Handler {
     }
 
     private void dismissProgressDialog() {
-        if (pd != null) {
+        if (pd != null && context != null) {
             pd.dismiss();
             pd = null;
         }

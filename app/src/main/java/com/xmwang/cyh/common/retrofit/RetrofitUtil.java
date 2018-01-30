@@ -1,23 +1,20 @@
-package com.xmwang.cyh.common;
+package com.xmwang.cyh.common.retrofit;
 
 import android.content.Context;
-import android.util.Log;
 
 import com.xmwang.cyh.api.ApiService;
-import com.xmwang.cyh.common.retrofit.BaseResponse;
-import com.xmwang.cyh.common.retrofit.ProgressSubscriber;
-import com.xmwang.cyh.common.retrofit.SubscriberOnNextListener;
+import com.xmwang.cyh.common.Data;
 import com.xmwang.cyh.model.DriveInfoModel;
 
 
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import okhttp3.OkHttpClient;
 import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava.RxJavaCallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
-import rx.Observable;
 import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
@@ -74,6 +71,15 @@ public class RetrofitUtil {
     public void driveInfo1(SubscriberOnNextListener<BaseResponse<List<DriveInfoModel>>> onNextListener){
         ProgressSubscriber<BaseResponse<List<DriveInfoModel>>> subscriber = new ProgressSubscriber<BaseResponse<List<DriveInfoModel>>>(onNextListener,mContext);
         mApiService.drive_info(Data.instance.AdminId,Data.instance.getUserId())
+                .subscribeOn(Schedulers.io())
+                .unsubscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(subscriber);
+
+    }
+    public void update_coordinate(Map<String, String> param, SubscriberOnNextListener<BaseResponse> onNextListener){
+        ProgressSubscriber<BaseResponse> subscriber = new ProgressSubscriber<BaseResponse>(onNextListener);
+        mRetrofit.create(ApiService.class).update_coordinate(param)
                 .subscribeOn(Schedulers.io())
                 .unsubscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
