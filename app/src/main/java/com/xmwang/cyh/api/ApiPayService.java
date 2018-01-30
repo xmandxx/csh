@@ -12,7 +12,7 @@ import retrofit2.http.POST;
  * Created by xmwang on 2018/1/17.
  */
 
-public interface ApiPayService {
+public interface ApiPayService  {
     //
     @FormUrlEncoded
     @POST("pay/weixin_pay")

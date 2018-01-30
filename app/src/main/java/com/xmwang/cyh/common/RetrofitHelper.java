@@ -61,6 +61,9 @@ public enum RetrofitHelper {
         }
         return apiPayService;
     }
+    public void enqueueEx(){
+
+    }
 //    private RetrofitHelper(){
 //        retrofit = new Retrofit.Builder()
 //                .baseUrl(baseUrl)

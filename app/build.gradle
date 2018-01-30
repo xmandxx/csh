@@ -62,7 +62,16 @@ dependencies {
     annotationProcessor 'com.jakewharton:butterknife-compiler:8.8.1'
     //    implementation 'com.squareup.okhttp3:okhttp:3.9.1'
     compile 'com.squareup.retrofit2:retrofit:2.3.0'
+//    compile 'io.reactivex.rxjava2:rxandroid:2.0.1'
+//    // Because RxAndroid releases are few and far between, it is recommended you also
+//    // explicitly depend on RxJava's latest version for bug fixes and new features.
+    compile 'io.reactivex.rxjava2:rxjava:2.1.8'
+    compile 'io.reactivex:rxandroid:1.2.1'
+    // Because RxAndroid releases are few and far between, it is recommended you also
+    // explicitly depend on RxJava's latest version for bug fixes and new features.
+//    compile 'io.reactivex.rxjava2:rxjava:2.1.1'
     compile 'com.squareup.retrofit2:converter-gson:2.0.2'
+    compile 'com.squareup.retrofit2:adapter-rxjava:2.1.0'
     //无需写selector的按钮控件
     compile 'com.github.medyo:fancybuttons:1.8.3'
     //recycler封装
@@ -93,4 +102,5 @@ dependencies {
 
     compile 'cn.jiguang.sdk:jpush:3.1.1'  // 此处以JPush 3.1.1 版本为例。
     compile 'cn.jiguang.sdk:jcore:1.1.9'  // 此处以JCore 1.1.9 版本为例。
+
 }

@@ -18,6 +18,8 @@ import retrofit2.Response;
 
 public enum Data {
     instance;
+    public String baseUrl = "http://api.che377.com/api/";
+    public String baseAdminUrl = "http://admin.che377.com/";
     public final String USER_ID_KEY = "s_user_id";
     public final String WXKEY = "wxa856b974892faaa7";
     public final String ALIPAY_KEY = "wxa856b974892faaa7";

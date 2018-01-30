@@ -3,17 +3,38 @@ package com.xmwang.cyh;
 import android.app.Application;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
+import android.util.Log;
 
+import com.amap.api.location.AMapLocation;
+import com.amap.api.location.AMapLocationClient;
+import com.amap.api.location.AMapLocationClientOption;
+import com.amap.api.location.AMapLocationListener;
 import com.xmwang.cyh.common.Data;
+import com.xmwang.cyh.common.RetrofitHelper;
+import com.xmwang.cyh.common.RetrofitUtil;
+import com.xmwang.cyh.common.SADialog;
+import com.xmwang.cyh.common.retrofit.BaseResponse;
+import com.xmwang.cyh.common.retrofit.ProgressSubscriber;
+import com.xmwang.cyh.common.retrofit.SubscriberOnNextListener;
+import com.xmwang.cyh.model.BaseModel;
+import com.xmwang.cyh.model.DriveInfo;
+import com.xmwang.cyh.model.DriveInfoModel;
+import com.xmwang.cyh.utils.ToastUtils;
+
+import java.util.List;
 
 import cn.jpush.android.api.JPushInterface;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 /**
  * @Description: MyApplication
  * @author: CTS
  * @date: 2017/2/16 10:36
  */
-public class MyApplication extends Application {
+public class MyApplication extends Application implements AMapLocationListener{
     private static MyApplication mcontext;
     public static MyApplication instances;
 //    /**
@@ -35,7 +56,10 @@ public class MyApplication extends Application {
 //    private static final String DB_NAME = "area2.db";
 //
 //    public static String APP_ID = "wxac995e7a84d8a0b5";
-
+    //声明AMapLocationClient类对象
+    private AMapLocationClient mLocationClient = null;
+    //声明AMapLocationClientOption对象
+    private AMapLocationClientOption mLocationOption = null;
     @Override
     public void onCreate() {
         super.onCreate();
@@ -46,6 +70,7 @@ public class MyApplication extends Application {
         instances = this;
         //刷新用户数据
         Data.instance.reUserInfo();
+        initAmap();
 //        ActiveAndroid.initialize(this);//初始化ORM框架
 //        Hawk.init(this).build();
 ////        getAppInfo();
@@ -94,6 +119,75 @@ public class MyApplication extends Application {
 
     public static Context getContext() {
         return mcontext;
+    }
+    private void initAmap(){
+        if (mLocationClient == null) {
+            //初始化定位
+            mLocationClient = new AMapLocationClient(getApplicationContext());
+            //设置定位回调监听
+            mLocationClient.setLocationListener(this);
+        }
+        if (mLocationOption == null){
+            //初始化AMapLocationClientOption对象
+            mLocationOption = new AMapLocationClientOption();
+            //设置定位模式为AMapLocationMode.Hight_Accuracy，高精度模式。
+            mLocationOption.setLocationMode(AMapLocationClientOption.AMapLocationMode.Hight_Accuracy);
+            //设置定位间隔,单位毫秒,默认为2000ms，最低1000ms,当前设置为10秒。
+            mLocationOption.setInterval(10000);
+            //设置是否返回地址信息（默认返回地址信息）,当前为不返回
+            mLocationOption.setNeedAddress(false);
+        }
+        mLocationOption.setLocationPurpose(AMapLocationClientOption.AMapLocationPurpose.Transport);
+        if(null != mLocationClient){
+            mLocationClient.setLocationOption(mLocationOption);
+            //设置场景模式后最好调用一次stop，再调用start以保证场景模式生效
+            mLocationClient.stopLocation();
+            mLocationClient.startLocation();
+        }
+
+    }
+    public void startLocation(){
+        if (mLocationClient != null) {
+            mLocationClient.startLocation();
+        }
+    }
+
+    @Override
+    public void onLocationChanged(AMapLocation amapLocation) {
+        if (amapLocation != null) {
+            if (amapLocation.getErrorCode() == 0) {
+                Log.e("AmapError","location Error, getLongitude:"
+                        + amapLocation.getLongitude() + ", getLatitude:"
+                        + amapLocation.getLatitude());
+                //可在其中解析amapLocation获取相应内容。
+                RetrofitHelper.instance.getApiService().update_coordinate(
+                        Data.instance.AdminId,
+                        Data.instance.getUserId(),
+                        String.valueOf(amapLocation.getLongitude()),
+                        String.valueOf(amapLocation.getLatitude())
+                ).enqueue(new Callback<BaseModel>() {
+                    @Override
+                    public void onResponse(Call<BaseModel> call, Response<BaseModel> response) {
+                        BaseModel baseModel = response.body();
+                        if (baseModel != null){
+                            Log.e("AmapError","update_coordinate:code:"
+                                    + baseModel.getCode());
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Call<BaseModel> call, Throwable t) {
+
+                    }
+                });
+
+            }else {
+                //定位失败时，可通过ErrCode（错误码）信息来确定失败的原因，errInfo是错误信息，详见错误码表。
+                Log.e("AmapError","location Error, ErrCode:"
+                        + amapLocation.getErrorCode() + ", errInfo:"
+                        + amapLocation.getErrorInfo());
+            }
+        }
     }
 
 //    private void getAppInfo() {

@@ -31,13 +31,19 @@ import com.amap.api.services.geocoder.GeocodeSearch;
 import com.amap.api.services.geocoder.RegeocodeQuery;
 import com.amap.api.services.geocoder.RegeocodeResult;
 import com.xmwang.cyh.BaseActivity;
+import com.xmwang.cyh.MyApplication;
 import com.xmwang.cyh.R;
 import com.xmwang.cyh.common.Data;
 import com.xmwang.cyh.common.RetrofitHelper;
+import com.xmwang.cyh.common.RetrofitUtil;
 import com.xmwang.cyh.common.SADialog;
 import com.xmwang.cyh.common.event.UserDriverInfoEvent;
+import com.xmwang.cyh.common.retrofit.BaseResponse;
+import com.xmwang.cyh.common.retrofit.ProgressSubscriber;
+import com.xmwang.cyh.common.retrofit.SubscriberOnNextListener;
 import com.xmwang.cyh.model.BaseModel;
 import com.xmwang.cyh.model.DriveInfo;
+import com.xmwang.cyh.model.DriveInfoModel;
 import com.xmwang.cyh.utils.ActivityManager;
 import com.xmwang.cyh.utils.GetTime;
 import com.xmwang.cyh.utils.ToastUtils;
@@ -103,6 +109,13 @@ public class IndexActivity extends BaseActivity implements OnMyLocationChangeLis
         setContentView(R.layout.activity_daijia_index);
         ButterKnife.bind(this);
 
+        RetrofitUtil.getInstance().driveInfo(new ProgressSubscriber<BaseResponse<List<DriveInfoModel>>>(new SubscriberOnNextListener<BaseResponse<List<DriveInfoModel>>>() {
+            @Override
+            public void onNext(BaseResponse<List<DriveInfoModel>> listBaseResponse) {
+                Log.e("xmwang","");
+            }
+        },this));
+
         //在activity执行onCreate时执行mMapView.onCreate(savedInstanceState)，创建地图
         mapView.onCreate(savedInstanceState);
         AndPermission.with(this)
@@ -113,6 +126,7 @@ public class IndexActivity extends BaseActivity implements OnMyLocationChangeLis
                     public void onSucceed(int requestCode, List<String> grantedPermissions) {
                         // Successfully.
                         if (requestCode == 200) {
+                            MyApplication.getInstances().startLocation();//启动全局定位
                             init();
                         }
                     }

@@ -14,7 +14,7 @@ import retrofit2.http.POST;
  * Created by xmWang on 2018/1/1.
  */
 
-public interface ApiUserService {
+public interface ApiUserService   {
     //发送验证码
     @FormUrlEncoded
     @POST("userinfo/send_code")
