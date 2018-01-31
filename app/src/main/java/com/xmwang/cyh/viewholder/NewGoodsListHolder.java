@@ -14,7 +14,7 @@ import com.xmwang.cyh.model.NewGoodsList;
  * @Date: 2017/6/14 15:16
  */
 
-public class NewGoodsListHolder extends BaseViewHolder<NewGoodsList.DataBean> {
+public class NewGoodsListHolder extends BaseViewHolder<NewGoodsList> {
     private TextView tv_pro, tv_gys, tv_place, tv_time, tv_price;
 
     public NewGoodsListHolder(ViewGroup parent) {
@@ -27,7 +27,7 @@ public class NewGoodsListHolder extends BaseViewHolder<NewGoodsList.DataBean> {
     }
 
     @Override
-    public void setData(final NewGoodsList.DataBean data) {
+    public void setData(final NewGoodsList data) {
 //        tv_pro.setText(data.getCategory_name() + "  " + data.getMass());
 //        tv_gys.setText(data.getSupplier());
 //        tv_place.setText(data.getCity());

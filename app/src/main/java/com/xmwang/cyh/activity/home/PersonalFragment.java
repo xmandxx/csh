@@ -18,10 +18,14 @@ import com.xmwang.cyh.activity.personal.MyCarActivity;
 import com.xmwang.cyh.activity.personal.MyOrderActivity;
 import com.xmwang.cyh.activity.personal.SettingActivity;
 import com.xmwang.cyh.activity.personal.WalletActivity;
+import com.xmwang.cyh.api.ApiUserService;
 import com.xmwang.cyh.application.GlideApp;
 import com.xmwang.cyh.common.Data;
 import com.xmwang.cyh.common.LazyLoadFragment;
 import com.xmwang.cyh.common.RetrofitHelper;
+import com.xmwang.cyh.common.retrofit.BaseResponse;
+import com.xmwang.cyh.common.retrofit.RetrofitUtil;
+import com.xmwang.cyh.common.retrofit.SubscriberOnNextListener;
 import com.xmwang.cyh.model.UserInfo;
 import com.xmwang.cyh.utils.ToastUtils;
 
@@ -74,7 +78,7 @@ public class PersonalFragment extends LazyLoadFragment {
                 loadData();
             }
         });
-        UserInfo.DataBean userInfo = Data.instance.getUserInfo();
+        UserInfo userInfo = Data.instance.getUserInfo();
         if (userInfo != null){
             txtRealname.setText(userInfo.getReal_name());
             txtQb.setText("￥"+userInfo.getUser_money());
@@ -88,30 +92,42 @@ public class PersonalFragment extends LazyLoadFragment {
         }
     }
     private void loadData(){
-        retrofit2.Call<UserInfo> call = RetrofitHelper.instance.getApiUserService().getuserinfo(
-                Data.instance.AdminId,
-                Data.instance.getUserId()
-        );
+        RetrofitUtil.getInstance()
+                .setObservable(RetrofitUtil.getInstance().getmRetrofit().create(ApiUserService.class).getuserinfo(Data.instance.AdminId, Data.instance.getUserId()))
+                .base(new SubscriberOnNextListener<BaseResponse<UserInfo>>() {
+                    @Override
+                    public void onNext(BaseResponse<UserInfo> baseResponse) {
+                        UserInfo userInfo = baseResponse.getDataInfo();
+                        if (userInfo != null) {
+                            Data.instance.setUserInfo(userInfo);
+                        }
+                        loadUI();
+                    }
+                });
+//        retrofit2.Call<UserInfo> call = RetrofitHelper.instance.getApiUserService().getuserinfo(
+//                Data.instance.AdminId,
+//                Data.instance.getUserId()
+//        );
 
-        call.enqueue(new Callback<UserInfo>() {
-            @Override
-            public void onResponse(retrofit2.Call<UserInfo> call, Response<UserInfo> response) {
-                swipeContainer.setRefreshing(false);
-                UserInfo model = response.body();
-                if (model.getCode() != RetrofitHelper.instance.SUCCESS_CODE) {
-                    return;
-                }
-                if (model.getData().size() > 0) {
-                    Data.instance.setUserInfo(model.getData().get(0));
-                }
-                loadUI();
-            }
-
-            @Override
-            public void onFailure(retrofit2.Call<UserInfo> call, Throwable t) {
-                swipeContainer.setRefreshing(false);
-            }
-        });
+//        call.enqueue(new Callback<UserInfo>() {
+//            @Override
+//            public void onResponse(retrofit2.Call<UserInfo> call, Response<UserInfo> response) {
+//                swipeContainer.setRefreshing(false);
+//                UserInfo model = response.body();
+//                if (model.getCode() != RetrofitHelper.instance.SUCCESS_CODE) {
+//                    return;
+//                }
+//                if (model.getData().size() > 0) {
+//                    Data.instance.setUserInfo(model.getData().get(0));
+//                }
+//                loadUI();
+//            }
+//
+//            @Override
+//            public void onFailure(retrofit2.Call<UserInfo> call, Throwable t) {
+//                swipeContainer.setRefreshing(false);
+//            }
+//        });
     }
     @Override
     protected void lazyLoad() {

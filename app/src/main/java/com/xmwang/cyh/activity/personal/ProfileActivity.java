@@ -13,8 +13,12 @@ import android.widget.TextView;
 
 import com.xmwang.cyh.BaseActivity;
 import com.xmwang.cyh.R;
+import com.xmwang.cyh.api.ApiUserService;
 import com.xmwang.cyh.common.Data;
 import com.xmwang.cyh.common.RetrofitHelper;
+import com.xmwang.cyh.common.retrofit.BaseResponse;
+import com.xmwang.cyh.common.retrofit.RetrofitUtil;
+import com.xmwang.cyh.common.retrofit.SubscriberOnNextListener;
 import com.xmwang.cyh.model.BaseModel;
 import com.xmwang.cyh.model.UserInfo;
 import com.xmwang.cyh.utils.ToastUtils;
@@ -26,6 +30,7 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import retrofit2.Callback;
 import retrofit2.Response;
+import rx.Observable;
 
 public class ProfileActivity extends BaseActivity {
 
@@ -40,6 +45,7 @@ public class ProfileActivity extends BaseActivity {
     @BindView(R.id.ll_gender)
     LinearLayout llGender;
     private String gender = "1";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -48,33 +54,21 @@ public class ProfileActivity extends BaseActivity {
         init();
     }
 
-    private void init(){
-        retrofit2.Call<UserInfo> call = RetrofitHelper.instance.getApiUserService().getuserinfo(
-                Data.instance.AdminId,
-                Data.instance.getUserId()
-        );
-
-        call.enqueue(new Callback<UserInfo>() {
-            @Override
-            public void onResponse(retrofit2.Call<UserInfo> call, Response<UserInfo> response) {
-                UserInfo model = response.body();
-                if (model.getCode() != RetrofitHelper.instance.SUCCESS_CODE) {
-                    return;
-                }
-                if (model.getData().size() > 0) {
-                    UserInfo.DataBean uModel = model.getData().get(0);
-                    txtRealName.setText(uModel.getReal_name());
-                    txtCyName.setText(uModel.getUser_name());
-                    txtGender.setText(uModel.getSex() == 1 ? "男" : "女");
-                    gender = String.valueOf(uModel.getSex());
-                }
-            }
-
-            @Override
-            public void onFailure(retrofit2.Call<UserInfo> call, Throwable t) {
-
-            }
-        });
+    private void init() {
+        RetrofitUtil.getInstance()
+                .setObservable(RetrofitUtil.getInstance().getmRetrofit().create(ApiUserService.class).getuserinfo(Data.instance.AdminId, Data.instance.getUserId()))
+                .base(new SubscriberOnNextListener<BaseResponse<UserInfo>>() {
+                    @Override
+                    public void onNext(BaseResponse<UserInfo> baseResponse) {
+                        UserInfo userInfo = baseResponse.getDataInfo();
+                        if (userInfo != null) {
+                            txtRealName.setText(userInfo.getReal_name());
+                            txtCyName.setText(userInfo.getUser_name());
+                            txtGender.setText(userInfo.getSex() == 1 ? "男" : "女");
+                            gender = String.valueOf(userInfo.getSex());
+                        }
+                    }
+                });
     }
 
     @OnClick({R.id.title_back, R.id.btn_img, R.id.ll_profile, R.id.ll_gender, R.id.ll_qcode, R.id.btn_save})
@@ -96,16 +90,17 @@ public class ProfileActivity extends BaseActivity {
                 break;
         }
     }
-    private void genderAction(){
-        String[] items = {"男","女"};
+
+    private void genderAction() {
+        String[] items = {"男", "女"};
         AlertDialog dialog = new AlertDialog.Builder(this).setTitle("选择性别")
                 .setItems(items, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        if (which == 1){
+                        if (which == 1) {
                             gender = "1";
                             txtGender.setText("男");
-                        }else{
+                        } else {
                             gender = "0";
                             txtGender.setText("女");
                         }
@@ -113,39 +108,36 @@ public class ProfileActivity extends BaseActivity {
                 }).create();
         dialog.show();
     }
-    private void save(){
-        if (TextUtils.isEmpty(txtRealName.getText())){
+
+    private void save() {
+        if (TextUtils.isEmpty(txtRealName.getText())) {
             ToastUtils.getInstance().toastShow("请输入真实姓名");
             return;
         }
-        if (TextUtils.isEmpty(txtCyName.getText())){
+        if (TextUtils.isEmpty(txtCyName.getText())) {
             ToastUtils.getInstance().toastShow("请输入车友名");
             return;
         }
-        retrofit2.Call<BaseModel> call = RetrofitHelper.instance.getApiUserService().editUser(
+        Observable observable = RetrofitUtil.getInstance().getmRetrofit().create(ApiUserService.class).editUser(
                 Data.instance.getUserId(),
                 "",
                 txtRealName.getText().toString(),
                 txtCyName.getText().toString(),
                 gender
         );
+        RetrofitUtil.getInstance()
+                .setObservable(observable)
+                .base(new SubscriberOnNextListener<BaseResponse>() {
+                    @Override
+                    public void onNext(BaseResponse baseResponse) {
+                        if (baseResponse.isSuccess()) {
+                            ToastUtils.getInstance().toastShow(baseResponse.message);
+                            finish();
+                        } else {
 
-        call.enqueue(new Callback<BaseModel>() {
-            @Override
-            public void onResponse(retrofit2.Call<BaseModel> call, Response<BaseModel> response) {
-                BaseModel model = response.body();
-                ToastUtils.getInstance().toastShow(model.getMessage());
-                if (model.getCode() != RetrofitHelper.instance.SUCCESS_CODE) {
-                    return;
-                }
-                finish();
-            }
-
-            @Override
-            public void onFailure(retrofit2.Call<BaseModel> call, Throwable t) {
-
-            }
-        });
+                        }
+                    }
+                },this);
     }
 
 }

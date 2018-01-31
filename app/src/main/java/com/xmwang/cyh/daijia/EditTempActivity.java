@@ -1,6 +1,7 @@
 package com.xmwang.cyh.daijia;
 
 import android.app.TimePickerDialog;
+import android.content.Intent;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -23,8 +24,13 @@ import com.jude.easyrecyclerview.adapter.BaseViewHolder;
 import com.jude.easyrecyclerview.adapter.RecyclerArrayAdapter;
 import com.xmwang.cyh.BaseActivity;
 import com.xmwang.cyh.R;
+import com.xmwang.cyh.api.ApiService;
 import com.xmwang.cyh.common.Data;
 import com.xmwang.cyh.common.RetrofitHelper;
+import com.xmwang.cyh.common.event.UserDriverInfoEvent;
+import com.xmwang.cyh.common.retrofit.BaseResponse;
+import com.xmwang.cyh.common.retrofit.RetrofitUtil;
+import com.xmwang.cyh.common.retrofit.SubscriberOnNextListener;
 import com.xmwang.cyh.model.KilometerModel;
 import com.xmwang.cyh.model.MoneyModel;
 import com.xmwang.cyh.model.TempInfo;
@@ -48,6 +54,7 @@ import chihane.jdselector.Selector;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
+import rx.Observable;
 
 /**
  * Created by xmWang on 2017/12/25.
@@ -180,52 +187,44 @@ public class EditTempActivity extends BaseActivity {
 
     }
     private void initData(){
-        Call<TempInfo> call = RetrofitHelper.instance.getApiService().getTempInfo(Data.instance.getUserId(),charging_id);
-        call.enqueue(new Callback<TempInfo>() {
-            @Override
-            public void onResponse(Call<TempInfo> call, Response<TempInfo> response) {
-                TempInfo tempInfo = response.body();
-                if (tempInfo.getCode() != 200 || tempInfo.getData().size() == 0){
-                    Toast.makeText(EditTempActivity.this,tempInfo.getMessage(),Toast.LENGTH_LONG).show();
-                    return;
-                }
-                TempInfo.DataBean tempModel = tempInfo.getData().get(0);
-                etTempName.setText(tempModel.getCharging());
-                tvWaitTime.setText(String.valueOf(tempModel.getWait_time()));
-                tvAveTime.setText(String.valueOf(tempModel.getAve_time()));
-                tvAveMoney.setText(String.valueOf(tempModel.getAve_minute_money()));
-                adapter_temp.removeAll();
-                ls.clear();
-                for (TempInfo.DataBean.TimesBean timesBean: tempModel.getTimes()) {
-                    //list初始数据
+        Observable observable = RetrofitUtil.getInstance().getmRetrofit().create(ApiService.class).getTempInfo(Data.instance.getUserId(),charging_id);
+        RetrofitUtil.getInstance()
+                .setObservable(observable)
+                .base(new SubscriberOnNextListener<BaseResponse<TempInfo>>() {
+                    @Override
+                    public void onNext(BaseResponse<TempInfo> baseResponse) {
+                        if (baseResponse.getDataInfo() != null) {
+                            TempInfo tempModel = baseResponse.getDataInfo();
+                            etTempName.setText(tempModel.getCharging());
+                            tvWaitTime.setText(String.valueOf(tempModel.getWait_time()));
+                            tvAveTime.setText(String.valueOf(tempModel.getAve_time()));
+                            tvAveMoney.setText(String.valueOf(tempModel.getAve_minute_money()));
+                            adapter_temp.removeAll();
+                            ls.clear();
+                            for (TempInfo.TimesBean timesBean: tempModel.getTimes()) {
+                                //list初始数据
 
-                    String startTime =Integer.valueOf(timesBean.getStart_time() / 60) + ":" + Integer.valueOf(timesBean.getStart_time() - (Integer.valueOf(timesBean.getStart_time() / 60) * 60));
-                    String endTime = Integer.valueOf(timesBean.getEnd_time() / 60) + ":" + Integer.valueOf(timesBean.getEnd_time() - (Integer.valueOf(timesBean.getEnd_time() / 60) * 60));
-                    
-                    ls.add(new TempModel(startTime,
-                            endTime,
-                            timesBean.getStart_amount(),
-                            String.valueOf(timesBean.getStart_kilometre()),
-                            String.valueOf(timesBean.getAverage_kilometre()),
-                            String.valueOf(timesBean.getAverage_amount()))
-                    );
+                                String startTime =Integer.valueOf(timesBean.getStart_time() / 60) + ":" + Integer.valueOf(timesBean.getStart_time() - (Integer.valueOf(timesBean.getStart_time() / 60) * 60));
+                                String endTime = Integer.valueOf(timesBean.getEnd_time() / 60) + ":" + Integer.valueOf(timesBean.getEnd_time() - (Integer.valueOf(timesBean.getEnd_time() / 60) * 60));
+
+                                ls.add(new TempModel(startTime,
+                                        endTime,
+                                        timesBean.getStart_amount(),
+                                        String.valueOf(timesBean.getStart_kilometre()),
+                                        String.valueOf(timesBean.getAverage_kilometre()),
+                                        String.valueOf(timesBean.getAverage_amount()))
+                                );
 //                    ls.add(new TempModel("0", "0", "0", "0", "0", "0"));
 //                    ls.add(new TempModel("0", "0", "0", "0", "0", "0"));
 //                    ls.add(new TempModel("0", "0", "0", "0", "0", "0"));
 //                    ls.add(new TempModel("0", "0", "0", "0", "0", "0"));
 //                    ls.add(new TempModel("0", "0", "0", "0", "0", "0"));
 
-                }
-                adapter_temp.addAll(ls);
-
-
-            }
-
-            @Override
-            public void onFailure(Call<TempInfo> call, Throwable t) {
-
-            }
-        });
+                            }
+                            adapter_temp.addAll(ls);
+                        }
+                    }
+                }, this);
     }
 
     /**

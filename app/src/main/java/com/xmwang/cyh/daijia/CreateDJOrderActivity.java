@@ -15,9 +15,14 @@ import android.widget.Toast;
 
 import com.xmwang.cyh.BaseActivity;
 import com.xmwang.cyh.R;
+import com.xmwang.cyh.api.ApiHomeService;
+import com.xmwang.cyh.api.ApiService;
 import com.xmwang.cyh.common.Common;
 import com.xmwang.cyh.common.Data;
 import com.xmwang.cyh.common.RetrofitHelper;
+import com.xmwang.cyh.common.retrofit.BaseResponse;
+import com.xmwang.cyh.common.retrofit.RetrofitUtil;
+import com.xmwang.cyh.common.retrofit.SubscriberOnNextListener;
 import com.xmwang.cyh.model.OtherDriver;
 import com.xmwang.cyh.utils.ToastUtils;
 
@@ -28,6 +33,7 @@ import mehdi.sakout.fancybuttons.FancyButton;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
+import rx.Observable;
 
 /**
  * Created by xmWang on 2017/12/24.
@@ -58,32 +64,15 @@ public class CreateDJOrderActivity extends BaseActivity {
     }
 
     private void init() {
-        //注册广播接收器
-//        myReceiver = new MyReceiver();
-//        IntentFilter intentFilter = new IntentFilter();
-//        intentFilter.addAction("com.overorder");
-//        registerReceiver(myReceiver, intentFilter);
 
-        //注册广播
-        IntentFilter filter = new IntentFilter();
-        filter.addAction("com.overorder");
-        registerReceiver(mReceiver, filter);
     }
 
-    /**
-     * 广播接收
-     */
-    private BroadcastReceiver mReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            finish();
-        }
-    };
+
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        unregisterReceiver(mReceiver);
+
     }
 
     @OnClick({R.id.title_back, R.id.start_server})
@@ -103,7 +92,7 @@ public class CreateDJOrderActivity extends BaseActivity {
             ToastUtils.getInstance().toastShow("请输入正确的手机号");
             return;
         }
-        Call<OtherDriver> call = RetrofitHelper.instance.getApiService().addDriveOrder(
+        Observable observable = RetrofitUtil.getInstance().getmRetrofit().create(ApiService.class).addDriveOrder(
                 Data.instance.AdminId,
                 txtPhone.getText().toString().trim(),
                 Data.instance.getUserId(),
@@ -114,22 +103,17 @@ public class CreateDJOrderActivity extends BaseActivity {
                 String.valueOf(Data.instance.getLocation().getLatitude()),
                 String.valueOf(Data.instance.getPercentage())
         );
-        call.enqueue(new Callback<OtherDriver>() {
-            @Override
-            public void onResponse(Call<OtherDriver> call, Response<OtherDriver> response) {
-                OtherDriver otherDriver = response.body();
-                if (otherDriver == null || otherDriver.getData().size() == 0) {
-                    ToastUtils.getInstance().toastShow(otherDriver.getMessage());
-                    return;
-                }
-                Data.instance.setDriverOrderId(otherDriver.getData().get(0).getOrder_id());
-                startActivity(new Intent(CreateDJOrderActivity.this, TaximeterActivity.class));
-            }
-
-            @Override
-            public void onFailure(Call<OtherDriver> call, Throwable t) {
-                Toast.makeText(CreateDJOrderActivity.this, "发起失败", Toast.LENGTH_LONG).show();
-            }
-        });
+        RetrofitUtil.getInstance()
+                .setObservable(observable)
+                .base(new SubscriberOnNextListener<BaseResponse<OtherDriver>>() {
+                    @Override
+                    public void onNext(BaseResponse<OtherDriver> baseResponse) {
+                        if (baseResponse.getDataInfo() != null) {
+                            Data.instance.setDriverOrderId(baseResponse.getDataInfo().getOrder_id());
+                            startActivity(new Intent(CreateDJOrderActivity.this, TaximeterActivity.class));
+                            finish();
+                        }
+                    }
+                }, this);
     }
 }

@@ -7,41 +7,7 @@ import java.util.List;
  */
 
 public class NewGoodsList {
-    /**
-     * code : 200
-     * message : 商品列表
-     * data : [{"goods_name":"强暴鸡米花","goods_id":632,"supplier_id":9,"market_price":"9.60","shop_price":"8.00","goods_img":"themesmobile/68ecshopcom_mobile/images/pic14-1.jpg","sale_num":10}]
-     */
 
-    private int code;
-    private String message;
-    private List<DataBean> data;
-
-    public int getCode() {
-        return code;
-    }
-
-    public void setCode(int code) {
-        this.code = code;
-    }
-
-    public String getMessage() {
-        return message;
-    }
-
-    public void setMessage(String message) {
-        this.message = message;
-    }
-
-    public List<DataBean> getData() {
-        return data;
-    }
-
-    public void setData(List<DataBean> data) {
-        this.data = data;
-    }
-
-    public static class DataBean {
         /**
          * goods_name : 强暴鸡米花
          * goods_id : 632
@@ -116,4 +82,4 @@ public class NewGoodsList {
             this.sale_num = sale_num;
         }
     }
-}
+

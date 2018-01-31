@@ -8,41 +8,7 @@ import java.util.List;
 
 public class LoveCarModel {
 
-    /**
-     * code : 200
-     * message : 获取成功
-     * data : [{"car_id":11,"car_name":"Jeep汽车","car_year":1478620800,"car_card":"豫A88888","car_kilometre":200,"car_number":"123456","user_id":69,"is_default":0,"cars_imgs":"","admin_id":1},{"car_id":12,"car_name":"五菱汽车","car_year":1481558400,"car_card":"豫A99999","car_kilometre":600,"car_number":"123456","user_id":69,"is_default":0,"cars_imgs":"","admin_id":1}]
-     */
 
-    private int code;
-    private String message;
-    private List<DataBean> data;
-
-    public int getCode() {
-        return code;
-    }
-
-    public void setCode(int code) {
-        this.code = code;
-    }
-
-    public String getMessage() {
-        return message;
-    }
-
-    public void setMessage(String message) {
-        this.message = message;
-    }
-
-    public List<DataBean> getData() {
-        return data;
-    }
-
-    public void setData(List<DataBean> data) {
-        this.data = data;
-    }
-
-    public static class DataBean {
         /**
          * car_id : 11
          * car_name : Jeep汽车
@@ -146,5 +112,5 @@ public class LoveCarModel {
         public void setAdmin_id(int admin_id) {
             this.admin_id = admin_id;
         }
-    }
+
 }

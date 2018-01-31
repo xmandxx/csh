@@ -7,41 +7,7 @@ import java.util.List;
  */
 
 public class DriveOrderInfo {
-    /**
-     * code : 200
-     * message : 获取成功
-     * data : [{"order_id":24,"order_sn":"SJ1712293762439","order_status":2,"driver_id":9,"user_id":0,"add_time":"2017-12-29 19:38:37","dricer_charging":20,"make_time":0,"referer_type":0,"order_amount":"0.00","crossing_amount":"0.00","long_amount":"0.00","other_amount":"0.00","dricer_amount":"0.00","taxation_amount":"0.00","origination":"河南省郑州市金水区如意湖街道商务外环路中银大厦","destination":"","running_kilometre":"0.00","running_time":0,"user_coupon_id":0,"coupon_money":"0.00","customer_name":"","wait_money":null,"wait_time":0,"customer_phone":"","running_money":null,"msg":"","admin_id":1,"buy_time":0,"percentage":"1.00"}]
-     */
 
-    private int code;
-    private String message;
-    private List<DataBean> data;
-
-    public int getCode() {
-        return code;
-    }
-
-    public void setCode(int code) {
-        this.code = code;
-    }
-
-    public String getMessage() {
-        return message;
-    }
-
-    public void setMessage(String message) {
-        this.message = message;
-    }
-
-    public List<DataBean> getData() {
-        return data;
-    }
-
-    public void setData(List<DataBean> data) {
-        this.data = data;
-    }
-
-    public static class DataBean {
         /**
          * order_id : 24
          * order_sn : SJ1712293762439
@@ -345,5 +311,5 @@ public class DriveOrderInfo {
         public void setPercentage(String percentage) {
             this.percentage = percentage;
         }
-    }
+
 }

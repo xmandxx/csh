@@ -14,6 +14,9 @@ import com.xmwang.cyh.R;
 import com.xmwang.cyh.api.ApiService;
 import com.xmwang.cyh.common.Data;
 import com.xmwang.cyh.common.RetrofitHelper;
+import com.xmwang.cyh.common.retrofit.BaseResponse;
+import com.xmwang.cyh.common.retrofit.RetrofitUtil;
+import com.xmwang.cyh.common.retrofit.SubscriberOnNextListener;
 import com.xmwang.cyh.model.Charging;
 
 import java.util.ArrayList;
@@ -27,6 +30,7 @@ import retrofit2.Callback;
 import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
+import rx.Observable;
 
 /**
  * Created by xmWang on 2017/12/25.
@@ -36,7 +40,7 @@ public class TempListActivity extends BaseActivity implements AdapterView.OnItem
 
     @BindView(R.id.list_view)
     ListView listView;
-    private List<Charging.DataBean> dataList;
+    private List<Charging> dataList;
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -50,26 +54,20 @@ public class TempListActivity extends BaseActivity implements AdapterView.OnItem
 
         final List<String> data = new ArrayList<String>();
 
-        Call<Charging> call = RetrofitHelper.instance.getApiService().charging(Data.instance.AdminId, Data.instance.getUserId());
-        call.enqueue(new Callback<Charging>() {
-            @Override
-            public void onResponse(Call<Charging> call, Response<Charging> response) {
-                Charging charging = response.body();
-                dataList = charging.getData();
-                for (Charging.DataBean cData: charging.getData()) {
-                    data.add(cData.getCharging());
-                }
-                listView.setAdapter(new ArrayAdapter<String>(TempListActivity.this,android.R.layout.simple_expandable_list_item_1,data));
-            }
-
-            @Override
-            public void onFailure(Call<Charging> call, Throwable t) {
-
-            }
-        });
+        Observable observable = RetrofitUtil.getInstance().getmRetrofit().create(ApiService.class).charging(Data.instance.AdminId, Data.instance.getUserId());
+        RetrofitUtil.getInstance()
+                .setObservable(observable)
+                .base(new SubscriberOnNextListener<BaseResponse<Charging>>() {
+                    @Override
+                    public void onNext(BaseResponse<Charging> baseResponse) {
+                        dataList = baseResponse.getDataList();
+                        for (Charging cData: dataList) {
+                            data.add(cData.getCharging());
+                        }
+                        listView.setAdapter(new ArrayAdapter<String>(TempListActivity.this,android.R.layout.simple_expandable_list_item_1,data));
+                    }
+                }, this);
         listView.setOnItemClickListener(this);
-
-
     }
 
     @OnClick({R.id.title_back})

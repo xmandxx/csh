@@ -16,9 +16,14 @@ import com.jude.easyrecyclerview.adapter.BaseViewHolder;
 import com.jude.easyrecyclerview.adapter.RecyclerArrayAdapter;
 import com.jude.easyrecyclerview.decoration.DividerDecoration;
 import com.xmwang.cyh.R;
+import com.xmwang.cyh.api.ApiService;
+import com.xmwang.cyh.api.ApiUserService;
 import com.xmwang.cyh.common.Data;
 import com.xmwang.cyh.common.RetrofitHelper;
 import com.xmwang.cyh.common.SADialog;
+import com.xmwang.cyh.common.retrofit.BaseResponse;
+import com.xmwang.cyh.common.retrofit.RetrofitUtil;
+import com.xmwang.cyh.common.retrofit.SubscriberOnNextListener;
 import com.xmwang.cyh.model.BaseModel;
 import com.xmwang.cyh.model.DriveOrderInfo;
 import com.xmwang.cyh.utils.ToastUtils;
@@ -29,6 +34,7 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import retrofit2.Callback;
 import retrofit2.Response;
+import rx.Observable;
 
 public class OrderActivity extends AppCompatActivity {
 
@@ -36,7 +42,8 @@ public class OrderActivity extends AppCompatActivity {
     EasyRecyclerView ervList;
     @BindView(R.id.swipe_container)
     SwipeRefreshLayout swipeContainer;
-    private RecyclerArrayAdapter<DriveOrderInfo.DataBean> adapter;
+    private RecyclerArrayAdapter<DriveOrderInfo> adapter;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -44,11 +51,13 @@ public class OrderActivity extends AppCompatActivity {
         ButterKnife.bind(this);
         init();
     }
+
     @Override
     protected void onDestroy() {
         super.onDestroy();
         SADialog.instance.hideProgress();
     }
+
     @OnClick({R.id.title_back})
     public void onViewClicked(View view) {
         switch (view.getId()) {
@@ -59,33 +68,27 @@ public class OrderActivity extends AppCompatActivity {
     }
 
 
-    private void setCarStatus(int id,int type){
-        retrofit2.Call<BaseModel> call = RetrofitHelper.instance.getApiUserService().user_cars_status(
+    private void setCarStatus(int id, int type) {
+        Observable observable = RetrofitUtil.getInstance().getmRetrofit().create(ApiUserService.class).user_cars_status(
                 Data.instance.AdminId,
                 Data.instance.getUserId(),
                 id,
                 type
         );
-        SADialog.instance.showProgress(this);
-        call.enqueue(new Callback<BaseModel>() {
-            @Override
-            public void onResponse(retrofit2.Call<BaseModel> call, Response<BaseModel> response) {
-                SADialog.instance.hideProgress();
-                BaseModel model = response.body();
-                ToastUtils.getInstance().toastShow(model.getMessage());
-                if (model.getCode() != RetrofitHelper.instance.SUCCESS_CODE) {
-                    return;
-                }
-                getList();
-            }
+        RetrofitUtil.getInstance()
+                .setObservable(observable)
+                .base(new SubscriberOnNextListener<BaseResponse>() {
+                    @Override
+                    public void onNext(BaseResponse baseResponse) {
+                        if (baseResponse.isSuccess()) {
+                            getList();
+                        }
 
-            @Override
-            public void onFailure(retrofit2.Call<BaseModel> call, Throwable t) {
-                SADialog.instance.hideProgress();
-            }
-        });
+                    }
+                });
     }
-    private void init(){
+
+    private void init() {
         swipeContainer.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
@@ -105,7 +108,7 @@ public class OrderActivity extends AppCompatActivity {
         itemDecoration.setDrawLastItem(false);
         ervList.addItemDecoration(itemDecoration);
 
-        ervList.setAdapterWithProgress(adapter = new RecyclerArrayAdapter<DriveOrderInfo.DataBean>(this) {
+        ervList.setAdapterWithProgress(adapter = new RecyclerArrayAdapter<DriveOrderInfo>(this) {
             @Override
             public BaseViewHolder OnCreateViewHolder(ViewGroup parent, int viewType) {
                 return new DJOrderHolder(parent);
@@ -115,36 +118,33 @@ public class OrderActivity extends AppCompatActivity {
             @Override
             public void onItemClick(int position, View view) {
                 String oid = String.valueOf(adapter.getAllData().get(position).getOrder_id());
-                Intent intent=new Intent();
-                intent.setClass(OrderActivity.this,OrderDetailActivity.class);
+                Intent intent = new Intent();
+                intent.setClass(OrderActivity.this, OrderDetailActivity.class);
                 intent.putExtra("driverOrderId", oid);
                 startActivity(intent);
             }
         });
         getList();
     }
-    private void getList(){
-        RetrofitHelper.instance.getApiService().getDriveOrderList(
+
+    private void getList() {
+        Observable observable = RetrofitUtil.getInstance().getmRetrofit().create(ApiService.class).getDriveOrderList(
                 Data.instance.AdminId,
                 Data.instance.getUserId()
-        ).enqueue(new Callback<DriveOrderInfo>() {
-            @Override
-            public void onResponse(retrofit2.Call<DriveOrderInfo> call, Response<DriveOrderInfo> response) {
-                swipeContainer.setRefreshing(false);
-                adapter.clear();
-                DriveOrderInfo model = response.body();
-                if (model.getCode() != RetrofitHelper.instance.SUCCESS_CODE) {
-                    return;
-                }
-                if (model.getData().size() > 0) {
-                    adapter.addAll(model.getData());
-                }
-            }
+        );
+        RetrofitUtil.getInstance()
+                .setObservable(observable)
+                .base(new SubscriberOnNextListener<BaseResponse<DriveOrderInfo>>() {
+                    @Override
+                    public void onNext(BaseResponse<DriveOrderInfo> baseResponse) {
+                        if (baseResponse.isSuccess()) {
+                            adapter.clear();
+                            if (baseResponse.getDataList().size() > 0) {
+                                adapter.addAll(baseResponse.getDataList());
+                            }
+                        }
 
-            @Override
-            public void onFailure(retrofit2.Call<DriveOrderInfo> call, Throwable t) {
-                swipeContainer.setRefreshing(false);
-            }
-        });
+                    }
+                });
     }
 }

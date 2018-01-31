@@ -11,10 +11,14 @@ import android.widget.TextView;
 
 import com.xmwang.cyh.BaseActivity;
 import com.xmwang.cyh.R;
+import com.xmwang.cyh.api.ApiUserService;
 import com.xmwang.cyh.common.Common;
 import com.xmwang.cyh.common.Data;
 import com.xmwang.cyh.common.RetrofitHelper;
 import com.xmwang.cyh.common.SADialog;
+import com.xmwang.cyh.common.retrofit.BaseResponse;
+import com.xmwang.cyh.common.retrofit.RetrofitUtil;
+import com.xmwang.cyh.common.retrofit.SubscriberOnNextListener;
 import com.xmwang.cyh.model.BaseModel;
 import com.xmwang.cyh.utils.ToastUtils;
 
@@ -24,6 +28,7 @@ import butterknife.OnClick;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
+import rx.Observable;
 
 public class RegisterActivity extends BaseActivity {
 
@@ -38,6 +43,7 @@ public class RegisterActivity extends BaseActivity {
     @BindView(R.id.cb_sm)
     CheckBox cbSm;
     boolean isSend = false;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -59,90 +65,83 @@ public class RegisterActivity extends BaseActivity {
                 break;
         }
     }
+
     @Override
     protected void onDestroy() {
         super.onDestroy();
         SADialog.instance.hideProgress();
     }
 
-    private void register(){
-        if (!cbSm.isChecked()){
+    private void register() {
+        if (!cbSm.isChecked()) {
             ToastUtils.getInstance().toastShow("请先接受协议");
             return;
         }
-        if (!Common.isMobile(txtPhone.getText().toString())){
+        if (!Common.isMobile(txtPhone.getText().toString())) {
             ToastUtils.getInstance().toastShow("请输入正确手机号");
             return;
         }
-        if (Common.isEmptyTrim(txtPwd.getText().toString())){
+        if (Common.isEmptyTrim(txtPwd.getText().toString())) {
             ToastUtils.getInstance().toastShow("请输入密码");
             return;
         }
-        if (Common.isEmptyTrim(txtCode.getText().toString())){
+        if (Common.isEmptyTrim(txtCode.getText().toString())) {
             ToastUtils.getInstance().toastShow("请输入验证码");
             return;
         }
-        SADialog.instance.showProgress(this);
-        Call<BaseModel> call = RetrofitHelper.instance.getApiUserService().register(
+//        SADialog.instance.showProgress(this);
+        Observable observable = RetrofitUtil.getInstance().getmRetrofit().create(ApiUserService.class).register(
                 Data.instance.AdminId,
                 txtPhone.getText().toString().trim(),
                 txtPwd.getText().toString().trim(),
                 txtCode.getText().toString().trim()
         );
-        call.enqueue(new Callback<BaseModel>() {
-            @Override
-            public void onResponse(Call<BaseModel> call, Response<BaseModel> response) {
-                BaseModel baseModel = response.body();
-                SADialog.instance.hideProgress();
-                ToastUtils.getInstance().toastShow(baseModel.getMessage());
-                if (baseModel.getCode() != RetrofitHelper.instance.SUCCESS_CODE) {
-                    return;
-                }
-                try{
-                    Thread.sleep(2000);
-                }catch (InterruptedException e) {}
-                finish();
-            }
 
-            @Override
-            public void onFailure(Call<BaseModel> call, Throwable t) {
-                SADialog.instance.hideProgress();
-                ToastUtils.getInstance().toastShow("注册失败");
-            }
-        });
+        RetrofitUtil.getInstance()
+                .setObservable(observable)
+                .base(new SubscriberOnNextListener<BaseResponse>() {
+                    @Override
+                    public void onNext(BaseResponse baseResponse) {
+                        if (baseResponse.isSuccess()) {
+                            ToastUtils.getInstance().toastShow(baseResponse.message);
+                            try {
+                                Thread.sleep(2000);
+                            } catch (InterruptedException e) {
+                            }
+                            finish();
+                        }
+                    }
+                }, this);
     }
 
-    private void sendCode(){
-        if (!Common.isMobile(txtPhone.getText().toString())){
+    private void sendCode() {
+        if (!Common.isMobile(txtPhone.getText().toString())) {
             ToastUtils.getInstance().toastShow("手机号不正确");
             return;
         }
-
-        Call<BaseModel> call = RetrofitHelper.instance.getApiUserService().sendCode(
+        Observable observable = RetrofitUtil.getInstance().getmRetrofit().create(ApiUserService.class).sendCode(
                 Data.instance.AdminId,
                 txtPhone.getText().toString().trim()
         );
-        call.enqueue(new Callback<BaseModel>() {
-            @Override
-            public void onResponse(Call<BaseModel> call, Response<BaseModel> response) {
-                BaseModel baseModel = response.body();
-                if (baseModel.getCode() != RetrofitHelper.instance.SUCCESS_CODE) {
-                    return;
-                }
-                btnSendCode.setEnabled(false);
-                timer.start();
-            }
-
-            @Override
-            public void onFailure(Call<BaseModel> call, Throwable t) {
-                ToastUtils.getInstance().toastShow("找回密码失败");
-            }
-        });
+        RetrofitUtil.getInstance()
+                .setObservable(observable)
+                .base(new SubscriberOnNextListener<BaseResponse>() {
+                    @Override
+                    public void onNext(BaseResponse baseResponse) {
+                        if (baseResponse.isSuccess()) {
+                            btnSendCode.setEnabled(false);
+                            timer.start();
+                        } else {
+//                            ToastUtils.getInstance().toastShow("发送失败");
+                        }
+                    }
+                },this);
     }
+
     public CountDownTimer timer = new CountDownTimer(60000, 1000) {
         @Override
         public void onTick(long millisUntilFinished) {
-            btnSendCode.setText("重试("+millisUntilFinished / 1000 +"s)");
+            btnSendCode.setText("重试(" + millisUntilFinished / 1000 + "s)");
         }
 
         @Override

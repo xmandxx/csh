@@ -22,7 +22,7 @@ import org.greenrobot.eventbus.EventBus;
 import butterknife.BindView;
 
 
-public class MyCarHolder extends BaseViewHolder<LoveCarModel.DataBean> {
+public class MyCarHolder extends BaseViewHolder<LoveCarModel> {
     TextView txtCarName;
     LinearLayout llEdit;
     LinearLayout llDel;
@@ -44,7 +44,7 @@ public class MyCarHolder extends BaseViewHolder<LoveCarModel.DataBean> {
     }
 
     @Override
-    public void setData(final LoveCarModel.DataBean data) {
+    public void setData(final LoveCarModel data) {
         //暂时这样处理
         if (data != null) {
             txtCarName.setText(data.getCar_name());

@@ -24,7 +24,7 @@ import com.xmwang.cyh.model.Utilities;
  * @Date: 2017/6/12 11:11
  */
 
-public class ActionHolder extends BaseViewHolder<Utilities.DataBean> {
+public class ActionHolder extends BaseViewHolder<Utilities> {
     private ImageView img;
     private TextView tv;
 
@@ -40,7 +40,7 @@ public class ActionHolder extends BaseViewHolder<Utilities.DataBean> {
     }
 
     @Override
-    public void setData(final Utilities.DataBean data) {
+    public void setData(final Utilities data) {
         GlideApp.with(getContext())
                 .load(RetrofitHelper.instance.baseAdminUrl + data.getAdmin_img_url())
                 .diskCacheStrategy(DiskCacheStrategy.RESOURCE)

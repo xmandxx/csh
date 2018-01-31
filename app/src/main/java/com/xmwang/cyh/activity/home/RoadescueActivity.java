@@ -26,11 +26,17 @@ import com.amap.api.services.geocoder.GeocodeResult;
 import com.amap.api.services.geocoder.GeocodeSearch;
 import com.amap.api.services.geocoder.RegeocodeQuery;
 import com.amap.api.services.geocoder.RegeocodeResult;
+import com.tencent.mm.opensdk.modelpay.PayReq;
 import com.xmwang.cyh.BaseActivity;
 import com.xmwang.cyh.R;
+import com.xmwang.cyh.api.ApiHomeService;
+import com.xmwang.cyh.api.ApiPayService;
 import com.xmwang.cyh.common.Data;
 import com.xmwang.cyh.common.RetrofitHelper;
 import com.xmwang.cyh.common.SADialog;
+import com.xmwang.cyh.common.retrofit.BaseResponse;
+import com.xmwang.cyh.common.retrofit.RetrofitUtil;
+import com.xmwang.cyh.common.retrofit.SubscriberOnNextListener;
 import com.xmwang.cyh.model.BaseModel;
 import com.xmwang.cyh.model.CSTelModel;
 import com.xmwang.cyh.utils.ToastUtils;
@@ -46,8 +52,9 @@ import butterknife.OnClick;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
+import rx.Observable;
 
-public class RoadescueActivity extends BaseActivity implements AMap.OnMyLocationChangeListener ,GeocodeSearch.OnGeocodeSearchListener{
+public class RoadescueActivity extends BaseActivity implements AMap.OnMyLocationChangeListener, GeocodeSearch.OnGeocodeSearchListener {
 
     @BindView(R.id.map)
     MapView mapView;
@@ -62,6 +69,7 @@ public class RoadescueActivity extends BaseActivity implements AMap.OnMyLocation
     GeocodeSearch geocoderSearch;
     Location currLocation;
     String address;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -76,7 +84,7 @@ public class RoadescueActivity extends BaseActivity implements AMap.OnMyLocation
                     @Override
                     public void onSucceed(int requestCode, List<String> grantedPermissions) {
                         // Successfully.
-                        if(requestCode == 200) {
+                        if (requestCode == 200) {
                             init();
                         }
                     }
@@ -84,7 +92,7 @@ public class RoadescueActivity extends BaseActivity implements AMap.OnMyLocation
                     @Override
                     public void onFailed(int requestCode, List<String> deniedPermissions) {
                         // Failure.
-                        if(requestCode == 200) {
+                        if (requestCode == 200) {
                             // TODO ...
                         }
                     }
@@ -106,10 +114,11 @@ public class RoadescueActivity extends BaseActivity implements AMap.OnMyLocation
                 break;
         }
     }
+
     @Override
     public void onRegeocodeSearched(RegeocodeResult result, int rCode) {
         //解析result获取地址描述信息
-        Log.e("amap", "逆地理编码："+result.getRegeocodeAddress().getFormatAddress());
+        Log.e("amap", "逆地理编码：" + result.getRegeocodeAddress().getFormatAddress());
         address = result.getRegeocodeAddress().getFormatAddress();
     }
 
@@ -146,10 +155,11 @@ public class RoadescueActivity extends BaseActivity implements AMap.OnMyLocation
         //在activity执行onSaveInstanceState时执行mMapView.onSaveInstanceState (outState)，保存地图当前的状态
         mapView.onSaveInstanceState(outState);
     }
+
     @Override
     public void onMyLocationChange(Location location) {
         // 定位回调监听
-        if(location != null) {
+        if (location != null) {
             //设置希望展示的地图缩放级别
             CameraUpdate mCameraUpdate = CameraUpdateFactory.zoomTo(15);
             aMap.animateCamera(mCameraUpdate);
@@ -157,7 +167,7 @@ public class RoadescueActivity extends BaseActivity implements AMap.OnMyLocation
             Data.instance.setLocation(location);
             Log.e("amap", "onMyLocationChange 定位成功， lat: " + location.getLatitude() + " lon: " + location.getLongitude());
             Bundle bundle = location.getExtras();
-            if(bundle != null) {
+            if (bundle != null) {
                 int errorCode = bundle.getInt(MyLocationStyle.ERROR_CODE);
                 String errorInfo = bundle.getString(MyLocationStyle.ERROR_INFO);
                 // 定位类型，可能为GPS WIFI等，具体可以参考官网的定位SDK介绍
@@ -169,10 +179,10 @@ public class RoadescueActivity extends BaseActivity implements AMap.OnMyLocation
                 locationType
                 */
 //                Log.e("amap", "定位信息， code: " + errorCode + " errorInfo: " + errorInfo + " locationType: " + locationType );
-                if (errorCode > 0){
-                    Toast.makeText(this,"定位失败，请打开定位权限",Toast.LENGTH_SHORT).show();
+                if (errorCode > 0) {
+                    Toast.makeText(this, "定位失败，请打开定位权限", Toast.LENGTH_SHORT).show();
                 }
-                regeocodeQuery(location.getLatitude(),location.getLongitude());
+                regeocodeQuery(location.getLatitude(), location.getLongitude());
                 currLocation = location;
 
             } else {
@@ -181,16 +191,18 @@ public class RoadescueActivity extends BaseActivity implements AMap.OnMyLocation
 
         } else {
             Log.e("amap", "定位失败");
-            Toast.makeText(this,"定位失败",Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "定位失败", Toast.LENGTH_SHORT).show();
         }
 
     }
+
     //反地理编码
-    private void regeocodeQuery(double latitude,double longitude){
-        LatLonPoint point = new LatLonPoint(latitude,longitude);
-        RegeocodeQuery query = new RegeocodeQuery(point, 200,GeocodeSearch.AMAP);
+    private void regeocodeQuery(double latitude, double longitude) {
+        LatLonPoint point = new LatLonPoint(latitude, longitude);
+        RegeocodeQuery query = new RegeocodeQuery(point, 200, GeocodeSearch.AMAP);
         geocoderSearch.getFromLocationAsyn(query);
     }
+
     private void init() {
 
         //防止穿透
@@ -211,7 +223,7 @@ public class RoadescueActivity extends BaseActivity implements AMap.OnMyLocation
 
         //初始化定位蓝点样式类myLocationStyle.myLocationType(MyLocationStyle.LOCATION_TYPE_LOCATION_ROTATE);
         //连续定位、且将视角移动到地图中心点，定位点依照设备方向旋转，并且会跟随设备移动。（1秒1次定位）如果不设置myLocationType，默认也会执行此种模式。
-        if(myLocationStyle ==null) {
+        if (myLocationStyle == null) {
             myLocationStyle = new MyLocationStyle();
         }
         myLocationStyle.showMyLocation(true);  //隐藏定位蓝点
@@ -227,20 +239,20 @@ public class RoadescueActivity extends BaseActivity implements AMap.OnMyLocation
         aMap.setOnMyLocationChangeListener(this);
 
         //逆地理
-        if (geocoderSearch == null){
+        if (geocoderSearch == null) {
             geocoderSearch = new GeocodeSearch(this);
         }
         geocoderSearch.setOnGeocodeSearchListener(this);
     }
 
-    private void submit(){
-        if (TextUtils.isEmpty(txtPhone.getText())){
+    private void submit() {
+        if (TextUtils.isEmpty(txtPhone.getText())) {
             ToastUtils.getInstance().toastShow("电话不能为空");
             return;
         }
-        SADialog.instance.showProgress(this);
+//        SADialog.instance.showProgress(this);
         String ds = Data.instance.getIsOnline() ? "0" : "2";
-        Call<BaseModel> call = RetrofitHelper.instance.getApiHomeService().add_roadescue(
+        Observable observable = RetrofitUtil.getInstance().getmRetrofit().create(ApiHomeService.class).add_roadescue(
                 Data.instance.AdminId,
                 Data.instance.getUserId(),
                 txtQing.getText().toString(),
@@ -249,51 +261,35 @@ public class RoadescueActivity extends BaseActivity implements AMap.OnMyLocation
                 String.valueOf(currLocation.getLatitude()),
                 address
         );
-        call.enqueue(new Callback<BaseModel>() {
-            @Override
-            public void onResponse(Call<BaseModel> call, Response<BaseModel> response) {
-                BaseModel baseModel = response.body();
-                SADialog.instance.hideProgress();
-                if (baseModel.getCode() != RetrofitHelper.instance.SUCCESS_CODE) {
-                    ToastUtils.getInstance().toastShow(baseModel.getMessage());
-                    return;
-                }
-
-            }
-
-            @Override
-            public void onFailure(Call<BaseModel> call, Throwable t) {
-                SADialog.instance.hideProgress();
-                ToastUtils.getInstance().toastShow("操作失败");
-            }
-        });
+        RetrofitUtil.getInstance()
+                .setObservable(observable)
+                .base(new SubscriberOnNextListener<BaseResponse>() {
+                    @Override
+                    public void onNext(BaseResponse baseResponse) {
+                        if (baseResponse.isSuccess()) {
+                            ToastUtils.getInstance().toastShow(baseResponse.message);
+                        }
+                    }
+                }, this);
     }
-    private void kf(){
-        SADialog.instance.showProgress(this);
-        Call<CSTelModel> call = RetrofitHelper.instance.getApiHomeService().get_cstel(
+
+    private void kf() {
+//        SADialog.instance.showProgress(this);
+        Observable observable = RetrofitUtil.getInstance().getmRetrofit().create(ApiHomeService.class).get_cstel(
                 Data.instance.AdminId
         );
-        call.enqueue(new Callback<CSTelModel>() {
-            @Override
-            public void onResponse(Call<CSTelModel> call, Response<CSTelModel> response) {
-                CSTelModel baseModel = response.body();
-                SADialog.instance.hideProgress();
-                if (baseModel.getCode() != RetrofitHelper.instance.SUCCESS_CODE) {
-                    ToastUtils.getInstance().toastShow(baseModel.getMessage());
-                    return;
-                }
-                CSTelModel.DataBean m = baseModel.getData().get(0);
-                Intent intent = new Intent(Intent.ACTION_DIAL, Uri.parse("tel:"+m.getTel()));
-                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                startActivity(intent);
-
-            }
-
-            @Override
-            public void onFailure(Call<CSTelModel> call, Throwable t) {
-                SADialog.instance.hideProgress();
-                ToastUtils.getInstance().toastShow("操作失败");
-            }
-        });
+        RetrofitUtil.getInstance()
+                .setObservable(observable)
+                .base(new SubscriberOnNextListener<BaseResponse<CSTelModel>>() {
+                    @Override
+                    public void onNext(BaseResponse<CSTelModel> baseResponse) {
+                        if (baseResponse.getDataInfo() != null) {
+                            CSTelModel m = baseResponse.getDataInfo();
+                            Intent intent = new Intent(Intent.ACTION_DIAL, Uri.parse("tel:" + m.getTel()));
+                            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                            startActivity(intent);
+                        }
+                    }
+                }, this);
     }
 }

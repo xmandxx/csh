@@ -17,7 +17,7 @@ import com.xmwang.cyh.model.OrderModel;
 import org.greenrobot.eventbus.EventBus;
 
 
-public class DJOrderHolder extends BaseViewHolder<DriveOrderInfo.DataBean> {
+public class DJOrderHolder extends BaseViewHolder<DriveOrderInfo> {
     TextView txtTime;
     TextView txtStart;
     TextView txtEnd;
@@ -31,7 +31,7 @@ public class DJOrderHolder extends BaseViewHolder<DriveOrderInfo.DataBean> {
     }
 
     @Override
-    public void setData(final DriveOrderInfo.DataBean data) {
+    public void setData(final DriveOrderInfo data) {
         //暂时这样处理
         if (data != null) {
             txtTime.setText(data.getAdd_time());

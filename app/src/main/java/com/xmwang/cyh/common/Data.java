@@ -4,6 +4,10 @@ import android.content.Context;
 import android.location.Location;
 
 import com.xmwang.cyh.MyApplication;
+import com.xmwang.cyh.api.ApiUserService;
+import com.xmwang.cyh.common.retrofit.BaseResponse;
+import com.xmwang.cyh.common.retrofit.RetrofitUtil;
+import com.xmwang.cyh.common.retrofit.SubscriberOnNextListener;
 import com.xmwang.cyh.model.DriveInfo;
 import com.xmwang.cyh.model.TempInfo;
 import com.xmwang.cyh.model.UserInfo;
@@ -27,12 +31,12 @@ public enum Data {
     private boolean isLogin;
     private boolean isOnline;
     private String userId;
-    private int chargingId;
+    private int chargingId = 0;
     private double percentage;  //里程比例
     private String driverOrderId;
-    private DriveInfo.DataBean driveInfo;
-    private UserInfo.DataBean userInfo;
-    private TempInfo.DataBean tempInfo;
+    private DriveInfo driveInfo;
+    private UserInfo userInfo;
+    private TempInfo tempInfo;
     private Location location;
     private String formatAddress;
     private String tempDestination;//临时存储目的地，非正式不传递给数据库
@@ -44,14 +48,16 @@ public enum Data {
     public void setTempDestination(String tempDestination) {
         this.tempDestination = tempDestination;
     }
+
     public Context getContext() {
-        if (mContext == null){
+        if (mContext == null) {
             mContext = MyApplication.getContext();
         }
         return mContext;
     }
 
     private Context mContext;
+
     public void setFormatAddress(String formatAddress) {
         this.formatAddress = formatAddress;
     }
@@ -69,15 +75,15 @@ public enum Data {
     }
 
 
-
-    public void setTempInfo(TempInfo.DataBean tempInfo) {
+    public void setTempInfo(TempInfo tempInfo) {
         this.tempInfo = tempInfo;
     }
-    public TempInfo.DataBean getTempInfo() {
+
+    public TempInfo getTempInfo() {
         return tempInfo;
     }
 
-    public boolean getIsLogin(){
+    public boolean getIsLogin() {
         return !getUserId().equals("0");
     }
 
@@ -85,40 +91,43 @@ public enum Data {
         isOnline = online;
     }
 
-    public boolean getIsOnline(){
+    public boolean getIsOnline() {
         return isOnline;
     }
 
-    public void setUserId(String userId){
+    public void setUserId(String userId) {
         this.userId = userId;
-        if (userId == null){
+        if (userId == null) {
             SPUtils.instance.remove(USER_ID_KEY);
-            JPushInterface.deleteAlias(getContext(),10036);
-        }else {
+            JPushInterface.deleteAlias(getContext(), 10036);
+        } else {
             SPUtils.instance.put(USER_ID_KEY, userId);
-            JPushInterface.setAlias(getContext(),10036,userId);
+            JPushInterface.setAlias(getContext(), 10036, userId);
         }
     }
-    public String getUserId(){
-        if (userId == null){
-            userId = SPUtils.instance.get(USER_ID_KEY,"0").toString();
+
+    public String getUserId() {
+        if (userId == null) {
+            userId = SPUtils.instance.get(USER_ID_KEY, "0").toString();
         }
         return this.userId;
     }
 
 
-    public void setChargingId(int chargingId){
+    public void setChargingId(int chargingId) {
         this.chargingId = chargingId;
     }
-    public int getChargingId(){
+
+    public int getChargingId() {
         return chargingId;
     }
 
 
-    public void setPercentage(double percentage){
+    public void setPercentage(double percentage) {
         this.percentage = percentage;
     }
-    public double getPercentage(){
+
+    public double getPercentage() {
         return percentage;
     }
 
@@ -131,62 +140,46 @@ public enum Data {
     }
 
 
-
-
-    public void setDriveInfo(DriveInfo.DataBean driveInfo) {
+    public void setDriveInfo(DriveInfo driveInfo) {
         this.driveInfo = driveInfo;
         this.setChargingId(driveInfo.getCharging_id());
         this.setPercentage(Double.valueOf(driveInfo.getPercentage()));
     }
 
-    public DriveInfo.DataBean getDriveInfo() {
+    public DriveInfo getDriveInfo() {
         return driveInfo;
     }
 
 
-
-
-    public UserInfo.DataBean getUserInfo() {
+    public UserInfo getUserInfo() {
         return userInfo;
     }
 
-    public void setUserInfo(UserInfo.DataBean userInfo) {
+    public void setUserInfo(UserInfo userInfo) {
         this.userInfo = userInfo;
-        if (userInfo == null){
+        if (userInfo == null) {
             this.setUserId(null);
-        }else{
+        } else {
             this.setUserId(String.valueOf(userInfo.getUser_id()));
         }
 
     }
 
-    public void reUserInfo(){
-        if (!this.getIsLogin()){
+    public void reUserInfo() {
+        if (!this.getIsLogin()) {
             return;
         }
-        retrofit2.Call<UserInfo> call = RetrofitHelper.instance.getApiUserService().getuserinfo(
-                Data.instance.AdminId,
-                Data.instance.getUserId()
-        );
+        RetrofitUtil.getInstance()
+                .setObservable(RetrofitUtil.getInstance().getmRetrofit().create(ApiUserService.class).getuserinfo(Data.instance.AdminId, Data.instance.getUserId()))
+                .base(new SubscriberOnNextListener<BaseResponse<UserInfo>>() {
+                    @Override
+                    public void onNext(BaseResponse<UserInfo> baseResponse) {
+                        UserInfo userInfo = baseResponse.getDataInfo();
+                        if (userInfo != null) {
+                            Data.instance.setUserInfo(userInfo);
+                        }
 
-        call.enqueue(new Callback<UserInfo>() {
-            @Override
-            public void onResponse(retrofit2.Call<UserInfo> call, Response<UserInfo> response) {
-
-                UserInfo model = response.body();
-                if (model.getCode() != RetrofitHelper.instance.SUCCESS_CODE) {
-                    return;
-                }
-                if (model.getData().size() > 0) {
-                    Data.instance.setUserInfo(model.getData().get(0));
-                }
-
-            }
-
-            @Override
-            public void onFailure(retrofit2.Call<UserInfo> call, Throwable t) {
-
-            }
-        });
+                    }
+                });
     }
 }

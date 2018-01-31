@@ -14,9 +14,14 @@ import com.jude.easyrecyclerview.adapter.BaseViewHolder;
 import com.jude.easyrecyclerview.adapter.RecyclerArrayAdapter;
 import com.jude.easyrecyclerview.decoration.DividerDecoration;
 import com.xmwang.cyh.R;
+import com.xmwang.cyh.api.ApiHomeService;
+import com.xmwang.cyh.api.ApiUserService;
 import com.xmwang.cyh.common.Data;
 import com.xmwang.cyh.common.LazyLoadFragment;
 import com.xmwang.cyh.common.RetrofitHelper;
+import com.xmwang.cyh.common.retrofit.BaseResponse;
+import com.xmwang.cyh.common.retrofit.RetrofitUtil;
+import com.xmwang.cyh.common.retrofit.SubscriberOnNextListener;
 import com.xmwang.cyh.model.MyCouponsModel;
 import com.xmwang.cyh.viewholder.ExceedCouponsListHolder;
 
@@ -25,6 +30,7 @@ import butterknife.ButterKnife;
 import butterknife.Unbinder;
 import retrofit2.Callback;
 import retrofit2.Response;
+import rx.Observable;
 
 /**
  * Created by xmWang on 2018/1/15.
@@ -38,7 +44,8 @@ public class ExceedCouponsFragment extends LazyLoadFragment {
     SwipeRefreshLayout swipeContainer;
     Unbinder unbinder;
     private Context context;
-    private RecyclerArrayAdapter<MyCouponsModel.DataBean> adapter;
+    private RecyclerArrayAdapter<MyCouponsModel> adapter;
+
     public ExceedCouponsFragment(Context context) {
         this.context = context;
     }
@@ -93,7 +100,7 @@ public class ExceedCouponsFragment extends LazyLoadFragment {
         itemDecoration.setDrawLastItem(false);
         ervList.addItemDecoration(itemDecoration);
 
-        ervList.setAdapterWithProgress(adapter = new RecyclerArrayAdapter<MyCouponsModel.DataBean>(context) {
+        ervList.setAdapterWithProgress(adapter = new RecyclerArrayAdapter<MyCouponsModel>(context) {
             @Override
             public BaseViewHolder OnCreateViewHolder(ViewGroup parent, int viewType) {
                 return new ExceedCouponsListHolder(parent);
@@ -112,31 +119,26 @@ public class ExceedCouponsFragment extends LazyLoadFragment {
         getList();
     }
 
-    private void getList(){
-        retrofit2.Call<MyCouponsModel> call = RetrofitHelper.instance.getApiHomeService().exceed_coupons(
+    private void getList() {
+        Observable observable = RetrofitUtil.getInstance().getmRetrofit().create(ApiHomeService.class).exceed_coupons(
                 Data.instance.AdminId,
                 Data.instance.getUserId()
         );
+        RetrofitUtil.getInstance()
+                .setObservable(observable)
+                .base(new SubscriberOnNextListener<BaseResponse<MyCouponsModel>>() {
+                    @Override
+                    public void onNext(BaseResponse<MyCouponsModel> baseResponse) {
+                        swipeContainer.setRefreshing(false);
 
-        call.enqueue(new Callback<MyCouponsModel>() {
-            @Override
-            public void onResponse(retrofit2.Call<MyCouponsModel> call, Response<MyCouponsModel> response) {
-                swipeContainer.setRefreshing(false);
-                MyCouponsModel model = response.body();
-                if (model.getCode() != RetrofitHelper.instance.SUCCESS_CODE) {
-                    return;
-                }
-                if (model.getData().size() > 0) {
-//                    sortList(ls);
-                    adapter.clear();
-                    adapter.addAll(model.getData());
-                }
-            }
+                        adapter.clear();
 
-            @Override
-            public void onFailure(retrofit2.Call<MyCouponsModel> call, Throwable t) {
-                swipeContainer.setRefreshing(false);
-            }
-        });
+                        if (baseResponse.getDataList() != null) {
+                            adapter.addAll(baseResponse.getDataList());
+                        }
+
+                    }
+                });
+
     }
 }

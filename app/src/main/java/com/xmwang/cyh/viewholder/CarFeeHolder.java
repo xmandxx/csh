@@ -22,7 +22,7 @@ import butterknife.BindView;
  * @Date: 2017/6/14 15:16
  */
 
-public class CarFeeHolder extends BaseViewHolder<CarFee.DataBean> {
+public class CarFeeHolder extends BaseViewHolder<CarFee> {
     TextView txtDate;
     ImageView img;
     TextView txtTitle;
@@ -38,7 +38,7 @@ public class CarFeeHolder extends BaseViewHolder<CarFee.DataBean> {
     }
 
     @Override
-    public void setData(final CarFee.DataBean data) {
+    public void setData(final CarFee data) {
 
         if (data != null) {
             txtTitle.setText(data.getFee_title());

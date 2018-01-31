@@ -8,41 +8,7 @@ import java.util.List;
 
 public class QiangCouponsModel {
 
-    /**
-     * code : 200
-     * message : 获取成功
-     * data : [{"coupon_id":10,"coupon_name":"10元抵用券","type":1,"start_time":"2017-12-24","end_time":"2017-12-29","coupon_num":20,"coupon_pic":"/data/favourable_action_pic/coupon0/original0_10_580x260.jpg","min_amount":"0.00","max_amount":"0.00","discount":"10.00","user_coupon_num":0,"supplier_id":0,"admin_id":1},{"coupon_id":9,"coupon_name":"10元抵用券","type":1,"start_time":"2017-12-24","end_time":"2017-12-29","coupon_num":10,"coupon_pic":"/data/favourable_action_pic/coupon12/original12_9_580x260.jpg","min_amount":"0.00","max_amount":"0.00","discount":"10.00","user_coupon_num":0,"supplier_id":12,"admin_id":1},{"coupon_id":8,"coupon_name":"30元抵用券","type":1,"start_time":"2017-12-24","end_time":"2017-12-30","coupon_num":5,"coupon_pic":"/data/favourable_action_pic/coupon9/original9_8_580x260.jpg","min_amount":"0.00","max_amount":"0.00","discount":"30.00","user_coupon_num":0,"supplier_id":9,"admin_id":1},{"coupon_id":7,"coupon_name":"shop优惠券","type":0,"start_time":"2017-05-31","end_time":"2017-06-03","coupon_num":1,"coupon_pic":"/data/favourable_action_pic/coupon9/original9_7_580x260.jpg","min_amount":"50.00","max_amount":"0.00","discount":"10.00","user_coupon_num":1,"supplier_id":9,"admin_id":1},{"coupon_id":6,"coupon_name":"消费满30元优惠2元","type":0,"start_time":"2017-04-26","end_time":"2017-05-30","coupon_num":2,"coupon_pic":"/data/favourable_action_pic/coupon9/original9_6_580x260.jpg","min_amount":"30.00","max_amount":"0.00","discount":"2.00","user_coupon_num":1,"supplier_id":9,"admin_id":1},{"coupon_id":5,"coupon_name":"消费满20元优惠1元","type":0,"start_time":"2017-04-26","end_time":"2017-06-29","coupon_num":5,"coupon_pic":"/data/favourable_action_pic/coupon9/original9_5_580x260.jpg","min_amount":"20.00","max_amount":"0.00","discount":"1.00","user_coupon_num":2,"supplier_id":9,"admin_id":1}]
-     */
 
-    private int code;
-    private String message;
-    private List<DataBean> data;
-
-    public int getCode() {
-        return code;
-    }
-
-    public void setCode(int code) {
-        this.code = code;
-    }
-
-    public String getMessage() {
-        return message;
-    }
-
-    public void setMessage(String message) {
-        this.message = message;
-    }
-
-    public List<DataBean> getData() {
-        return data;
-    }
-
-    public void setData(List<DataBean> data) {
-        this.data = data;
-    }
-
-    public static class DataBean {
         /**
          * coupon_id : 10
          * coupon_name : 10元抵用券
@@ -185,4 +151,4 @@ public class QiangCouponsModel {
             this.admin_id = admin_id;
         }
     }
-}
+

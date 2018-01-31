@@ -8,41 +8,7 @@ import java.util.List;
 
 public class Charging {
 
-    /**
-     * code : 200
-     * message : 计费模板
-     * data : [{"charging_id":2,"charging":"默认计费模板"}]
-     */
 
-    private int code;
-    private String message;
-    private List<DataBean> data;
-
-    public int getCode() {
-        return code;
-    }
-
-    public void setCode(int code) {
-        this.code = code;
-    }
-
-    public String getMessage() {
-        return message;
-    }
-
-    public void setMessage(String message) {
-        this.message = message;
-    }
-
-    public List<DataBean> getData() {
-        return data;
-    }
-
-    public void setData(List<DataBean> data) {
-        this.data = data;
-    }
-
-    public static class DataBean {
         /**
          * charging_id : 2
          * charging : 默认计费模板
@@ -66,5 +32,5 @@ public class Charging {
         public void setCharging(String charging) {
             this.charging = charging;
         }
-    }
+
 }

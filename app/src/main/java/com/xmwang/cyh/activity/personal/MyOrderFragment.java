@@ -14,9 +14,13 @@ import com.jude.easyrecyclerview.adapter.BaseViewHolder;
 import com.jude.easyrecyclerview.adapter.RecyclerArrayAdapter;
 import com.jude.easyrecyclerview.decoration.DividerDecoration;
 import com.xmwang.cyh.R;
+import com.xmwang.cyh.api.ApiUserService;
 import com.xmwang.cyh.common.Data;
 import com.xmwang.cyh.common.LazyLoadFragment;
 import com.xmwang.cyh.common.RetrofitHelper;
+import com.xmwang.cyh.common.retrofit.BaseResponse;
+import com.xmwang.cyh.common.retrofit.RetrofitUtil;
+import com.xmwang.cyh.common.retrofit.SubscriberOnNextListener;
 import com.xmwang.cyh.model.MyCouponsModel;
 import com.xmwang.cyh.model.OrderModel;
 import com.xmwang.cyh.viewholder.MyCouponsListHolder;
@@ -27,6 +31,7 @@ import butterknife.ButterKnife;
 import butterknife.Unbinder;
 import retrofit2.Callback;
 import retrofit2.Response;
+import rx.Observable;
 
 /**
  * Created by xmWang on 2018/1/15.
@@ -42,8 +47,9 @@ public class MyOrderFragment extends LazyLoadFragment {
     private Context context;
     private int orderType = 1;
     private int pageIndex = 1;
-    private RecyclerArrayAdapter<OrderModel.DataBean> adapter;
-    public MyOrderFragment(Context context,int orderType) {
+    private RecyclerArrayAdapter<OrderModel> adapter;
+
+    public MyOrderFragment(Context context, int orderType) {
         this.context = context;
         this.orderType = orderType;
     }
@@ -98,7 +104,7 @@ public class MyOrderFragment extends LazyLoadFragment {
         itemDecoration.setDrawLastItem(false);
         ervList.addItemDecoration(itemDecoration);
 
-        ervList.setAdapterWithProgress(adapter = new RecyclerArrayAdapter<OrderModel.DataBean>(context) {
+        ervList.setAdapterWithProgress(adapter = new RecyclerArrayAdapter<OrderModel>(context) {
             @Override
             public BaseViewHolder OnCreateViewHolder(ViewGroup parent, int viewType) {
                 return new MyorderHolder(parent);
@@ -117,36 +123,28 @@ public class MyOrderFragment extends LazyLoadFragment {
         getList();
     }
 
-    private void getList(){
-        retrofit2.Call<OrderModel> call = RetrofitHelper.instance.getApiUserService().myOrder(
+    private void getList() {
+        Observable observable = RetrofitUtil.getInstance().getmRetrofit().create(ApiUserService.class).myOrder(
                 Data.instance.AdminId,
                 Data.instance.getUserId(),
                 1,
                 6,
                 pageIndex
         );
+        RetrofitUtil.getInstance()
+                .setObservable(observable)
+                .base(new SubscriberOnNextListener<BaseResponse<OrderModel>>() {
+                    @Override
+                    public void onNext(BaseResponse<OrderModel> baseResponse) {
+                        swipeContainer.setRefreshing(false);
+                        if (pageIndex == 1) {
+                            adapter.clear();
+                        }
+                        if (baseResponse.getDataList() != null) {
+                            adapter.addAll(baseResponse.getDataList());
+                        }
 
-        call.enqueue(new Callback<OrderModel>() {
-            @Override
-            public void onResponse(retrofit2.Call<OrderModel> call, Response<OrderModel> response) {
-                swipeContainer.setRefreshing(false);
-                OrderModel model = response.body();
-                if (model.getCode() != RetrofitHelper.instance.SUCCESS_CODE) {
-                    return;
-                }
-                if (model.getData().size() > 0) {
-//                    sortList(ls);
-                    if (pageIndex == 1) {
-                        adapter.clear();
                     }
-                    adapter.addAll(model.getData());
-                }
-            }
-
-            @Override
-            public void onFailure(retrofit2.Call<OrderModel> call, Throwable t) {
-                swipeContainer.setRefreshing(false);
-            }
-        });
+                },context);
     }
 }

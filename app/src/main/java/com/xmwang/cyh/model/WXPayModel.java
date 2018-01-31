@@ -10,41 +10,7 @@ import java.util.List;
 
 public class WXPayModel {
 
-    /**
-     * code : 200
-     * message : 获取成功!
-     * data : [{"noncestr":"6G7ZLxSVZ6Ee9qZb","package":"Sign=WXPay","partnerid":"1492050762","prepayid":"wx201801171727386b9ad6a4420347499616","timestamp":1516181258,"sign":"ED9A89DDA00615F9F440CF9530568942","order_no":"WXCZ1801173894746"}]
-     */
 
-    private int code;
-    private String message;
-    private List<DataBean> data;
-
-    public int getCode() {
-        return code;
-    }
-
-    public void setCode(int code) {
-        this.code = code;
-    }
-
-    public String getMessage() {
-        return message;
-    }
-
-    public void setMessage(String message) {
-        this.message = message;
-    }
-
-    public List<DataBean> getData() {
-        return data;
-    }
-
-    public void setData(List<DataBean> data) {
-        this.data = data;
-    }
-
-    public static class DataBean {
         /**
          * noncestr : 6G7ZLxSVZ6Ee9qZb
          * package : Sign=WXPay
@@ -119,5 +85,5 @@ public class WXPayModel {
         public void setOrder_no(String order_no) {
             this.order_no = order_no;
         }
-    }
+
 }

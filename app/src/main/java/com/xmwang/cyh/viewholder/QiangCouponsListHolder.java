@@ -23,7 +23,7 @@ import mehdi.sakout.fancybuttons.FancyButton;
  * @Date: 2017/6/14 15:16
  */
 
-public class QiangCouponsListHolder extends BaseViewHolder<QiangCouponsModel.DataBean> {
+public class QiangCouponsListHolder extends BaseViewHolder<QiangCouponsModel> {
 
     ImageView img;
     TextView txtTitle;
@@ -53,7 +53,7 @@ public class QiangCouponsListHolder extends BaseViewHolder<QiangCouponsModel.Dat
     }
 
     @Override
-    public void setData(final QiangCouponsModel.DataBean data) {
+    public void setData(final QiangCouponsModel data) {
 
         if (data != null) {
             txtTitle.setText(data.getCoupon_name());

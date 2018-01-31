@@ -12,7 +12,7 @@ import com.xmwang.cyh.common.RetrofitHelper;
 import com.xmwang.cyh.model.OrderModel;
 
 
-public class MyorderHolder extends BaseViewHolder<OrderModel.DataBean> {
+public class MyorderHolder extends BaseViewHolder<OrderModel> {
     TextView txtTitle;
     TextView txtTitleRight;
     ImageView img;
@@ -37,7 +37,7 @@ public class MyorderHolder extends BaseViewHolder<OrderModel.DataBean> {
     }
 
     @Override
-    public void setData(final OrderModel.DataBean data) {
+    public void setData(final OrderModel data) {
         //暂时这样处理
         if (data != null) {
             txtTitle.setText(data.getSupplier_name());

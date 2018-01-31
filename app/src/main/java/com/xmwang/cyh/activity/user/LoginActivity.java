@@ -12,11 +12,15 @@ import android.widget.Toast;
 import com.xmwang.cyh.BaseActivity;
 import com.xmwang.cyh.R;
 import com.xmwang.cyh.activity.home.IndexActivity;
+import com.xmwang.cyh.api.ApiUserService;
 import com.xmwang.cyh.common.Common;
 import com.xmwang.cyh.common.CustomToast;
 import com.xmwang.cyh.common.Data;
 import com.xmwang.cyh.common.RetrofitHelper;
 import com.xmwang.cyh.common.SADialog;
+import com.xmwang.cyh.common.retrofit.BaseResponse;
+import com.xmwang.cyh.common.retrofit.RetrofitUtil;
+import com.xmwang.cyh.common.retrofit.SubscriberOnNextListener;
 import com.xmwang.cyh.model.UserInfo;
 import com.xmwang.cyh.utils.ActivityManager;
 import com.xmwang.cyh.utils.GetTime;
@@ -29,6 +33,7 @@ import cn.pedant.SweetAlert.SweetAlertDialog;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
+import rx.Observable;
 
 public class LoginActivity extends BaseActivity {
 
@@ -44,12 +49,12 @@ public class LoginActivity extends BaseActivity {
         ButterKnife.bind(this);
     }
 
-//    R.id.tv_register, R.id.btn_qq, R.id.btn_weixin, R.id.btn_sina
+    //    R.id.tv_register, R.id.btn_qq, R.id.btn_weixin, R.id.btn_sina
     @OnClick({R.id.tv_forget_pwd, R.id.btn_login})
     public void onViewClicked(View view) {
         switch (view.getId()) {
             case R.id.tv_forget_pwd:
-                startActivity(new Intent(this,ForgetPwdActivity.class));
+                startActivity(new Intent(this, ForgetPwdActivity.class));
                 break;
 //            case R.id.tv_register:
 //                startActivity(new Intent(this,RegisterActivity.class));
@@ -81,56 +86,46 @@ public class LoginActivity extends BaseActivity {
 //        //super.onBackPressed();
         // 当popupWindow 正在展示的时候 按下返回键 关闭popupWindow 否则关闭activity
 
-            if (GetTime.getInstance().isFastDoubleClick(2000)) {
-                ActivityManager.getInstance().removeAllActivity();
-            } else {
-                ToastUtils.getInstance().toastShow("再按一次退出程序");
-            }
+        if (GetTime.getInstance().isFastDoubleClick(2000)) {
+            ActivityManager.getInstance().removeAllActivity();
+        } else {
+            ToastUtils.getInstance().toastShow("再按一次退出程序");
+        }
     }
 
-    private void third_login(int type){
+    private void third_login(int type) {
         ToastUtils.getInstance().toastShow("暂未开放");
     }
 
 
-
-
-    private void login(){
-        if (!Common.isMobile(txtPhone.getText().toString())){
+    private void login() {
+        if (!Common.isMobile(txtPhone.getText().toString())) {
             ToastUtils.getInstance().toastShow("手机号格式不正确");
             return;
         }
-        if (TextUtils.isEmpty(txtPwd.getText())){
+        if (TextUtils.isEmpty(txtPwd.getText())) {
             ToastUtils.getInstance().toastShow("密码不能为空");
             return;
         }
 
-        SADialog.instance.showProgress(LoginActivity.this);
-        Call<UserInfo> call = RetrofitHelper.instance.getApiUserService().login(
+        Observable observable = RetrofitUtil.getInstance().getmRetrofit().create(ApiUserService.class).login(
                 Data.instance.AdminId,
                 txtPhone.getText().toString().trim(),
                 txtPwd.getText().toString().trim()
         );
-        call.enqueue(new Callback<UserInfo>() {
-            @Override
-            public void onResponse(Call<UserInfo> call, Response<UserInfo> response) {
-                UserInfo userInfo = response.body();
-                SADialog.instance.hideProgress();
-                if (userInfo.getCode() != RetrofitHelper.instance.SUCCESS_CODE) {
-                    ToastUtils.getInstance().toastShow(userInfo.getMessage());
-                    return;
-                }
-                Data.instance.setUserInfo(userInfo.getData().get(0));
-//                startActivity(new Intent(LoginActivity.this, IndexActivity.class));
-                startActivity(new Intent(LoginActivity.this, com.xmwang.cyh.daijia.IndexActivity.class));
-                finish();
-            }
-
-            @Override
-            public void onFailure(Call<UserInfo> call, Throwable t) {
-                SADialog.instance.hideProgress();
-                ToastUtils.getInstance().toastShow("登录失败");
-            }
-        });
+        RetrofitUtil.getInstance()
+                .setObservable(observable)
+                .base(new SubscriberOnNextListener<BaseResponse<UserInfo>>() {
+                    @Override
+                    public void onNext(BaseResponse<UserInfo> baseResponse) {
+                        if (baseResponse.isSuccess() && baseResponse.getDataInfo() != null) {
+                            Data.instance.setUserInfo(baseResponse.getDataInfo());
+                            startActivity(new Intent(LoginActivity.this, com.xmwang.cyh.daijia.IndexActivity.class));
+                            finish();
+                        } else {
+//                            ToastUtils.getInstance().toastShow("发送失败");
+                        }
+                    }
+                }, this);
     }
 }

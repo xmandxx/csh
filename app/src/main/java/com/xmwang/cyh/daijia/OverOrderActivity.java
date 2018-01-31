@@ -9,9 +9,13 @@ import android.widget.Toast;
 
 import com.xmwang.cyh.BaseActivity;
 import com.xmwang.cyh.R;
+import com.xmwang.cyh.api.ApiService;
 import com.xmwang.cyh.common.Data;
 import com.xmwang.cyh.common.RetrofitHelper;
 import com.xmwang.cyh.common.event.UserDriverInfoEvent;
+import com.xmwang.cyh.common.retrofit.BaseResponse;
+import com.xmwang.cyh.common.retrofit.RetrofitUtil;
+import com.xmwang.cyh.common.retrofit.SubscriberOnNextListener;
 import com.xmwang.cyh.model.DriveOrderInfo;
 
 import org.greenrobot.eventbus.EventBus;
@@ -23,6 +27,7 @@ import mehdi.sakout.fancybuttons.FancyButton;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
+import rx.Observable;
 
 /**
  * Created by xmWang on 2017/12/25.
@@ -58,45 +63,39 @@ public class OverOrderActivity extends BaseActivity {
         init();
     }
 
-    private void init(){
-        Call<DriveOrderInfo> call = RetrofitHelper.instance.getApiService().getDriveOrderInfo(
+    private void init() {
+        Observable observable = RetrofitUtil.getInstance().getmRetrofit().create(ApiService.class).getDriveOrderInfo(
                 Data.instance.AdminId,
                 Data.instance.getUserId(),
                 Data.instance.getDriverOrderId()
         );
-        call.enqueue(new Callback<DriveOrderInfo>() {
-            @Override
-            public void onResponse(Call<DriveOrderInfo> call, Response<DriveOrderInfo> response) {
-                DriveOrderInfo driveOrderInfo = response.body();
-                if (driveOrderInfo == null || driveOrderInfo.getData().size() == 0) {
-                    Toast.makeText(OverOrderActivity.this, driveOrderInfo.getMessage(), Toast.LENGTH_LONG).show();
-                    return;
-                }
-                DriveOrderInfo.DataBean dd = driveOrderInfo.getData().get(0);
-                txtKm.setText("行驶距离："+dd.getRunning_kilometre()+"km");
-                txtMoney.setText("行驶费用："+dd.getRunning_money()+"元");
-                txtOrderNumber.setText("订单编号："+dd.getOrder_sn());
-                txtWaitTime.setText("等待时间："+String.valueOf(dd.getWait_time())+"分钟");
-                txtWaitMoney.setText("等待费用："+String.valueOf(dd.getWait_money())+"元");
-                txtSumMoney.setText("总计："+dd.getOrder_amount()+"元");
-                startLocation.setText(dd.getOrigination());
-                endLocation.setText(dd.getDestination());
-            }
+        RetrofitUtil.getInstance()
+                .setObservable(observable)
+                .base(new SubscriberOnNextListener<BaseResponse<DriveOrderInfo>>() {
+                    @Override
+                    public void onNext(BaseResponse<DriveOrderInfo> baseResponse) {
+                        if (baseResponse.dataInfo != null) {
+                            DriveOrderInfo dd = baseResponse.dataInfo;
+                            txtKm.setText("行驶距离：" + dd.getRunning_kilometre() + "km");
+                            txtMoney.setText("行驶费用：" + dd.getRunning_money() + "元");
+                            txtOrderNumber.setText("订单编号：" + dd.getOrder_sn());
+                            txtWaitTime.setText("等待时间：" + String.valueOf(dd.getWait_time()) + "分钟");
+                            txtWaitMoney.setText("等待费用：" + String.valueOf(dd.getWait_money()) + "元");
+                            txtSumMoney.setText("总计：" + dd.getOrder_amount() + "元");
+                            startLocation.setText(dd.getOrigination());
+                            endLocation.setText(dd.getDestination());
 
-            @Override
-            public void onFailure(Call<DriveOrderInfo> call, Throwable t) {
+                        }
 
-                Toast.makeText(OverOrderActivity.this, "操作失败", Toast.LENGTH_LONG).show();
-            }
-        });
+                    }
+                });
     }
 
     @OnClick(R.id.btn_go_home)
     public void onViewClicked() {
-        Intent intent = new Intent("com.overorder");
-        sendBroadcast(intent);      //发送广播
         this.finish();
     }
+
     @Override
     public void onBackPressed() {
 //        自己处理返回按键的内容

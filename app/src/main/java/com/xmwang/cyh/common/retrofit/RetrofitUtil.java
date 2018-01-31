@@ -3,8 +3,11 @@ package com.xmwang.cyh.common.retrofit;
 import android.content.Context;
 
 import com.xmwang.cyh.api.ApiService;
+import com.xmwang.cyh.api.ApiUserService;
 import com.xmwang.cyh.common.Data;
 import com.xmwang.cyh.model.DriveInfoModel;
+import com.xmwang.cyh.model.Reckon;
+import com.xmwang.cyh.model.UserInfo;
 
 
 import java.util.List;
@@ -15,6 +18,7 @@ import okhttp3.OkHttpClient;
 import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava.RxJavaCallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
+import rx.Observable;
 import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
@@ -24,12 +28,11 @@ import rx.schedulers.Schedulers;
 
 public class RetrofitUtil {
     public static final int DEFAULT_TIMEOUT = 5;
-
     private Retrofit mRetrofit;
     private ApiService mApiService;
     private Context mContext;
     private static RetrofitUtil mInstance;
-
+    private Observable<Class> observable;
     /**
      * 私有构造方法
      */
@@ -53,37 +56,35 @@ public class RetrofitUtil {
         }
         return mInstance;
     }
+    public Retrofit getmRetrofit() {
+        return mRetrofit;
+    }
     public void setContext(Context context){
         mContext = context;
     }
-    /**
-     * 用于获取用户信息
-     * @param subscriber
-     */
-    public void driveInfo(Subscriber<BaseResponse<List<DriveInfoModel>>> subscriber){
-        mApiService.drive_info(Data.instance.AdminId,Data.instance.getUserId())
-                .subscribeOn(Schedulers.io())
-                .unsubscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(subscriber);
-
+    public RetrofitUtil setObservable(Observable observable) {
+        this.observable = observable;
+        return RetrofitUtil.getInstance();
     }
-    public void driveInfo1(SubscriberOnNextListener<BaseResponse<List<DriveInfoModel>>> onNextListener){
-        ProgressSubscriber<BaseResponse<List<DriveInfoModel>>> subscriber = new ProgressSubscriber<BaseResponse<List<DriveInfoModel>>>(onNextListener,mContext);
-        mApiService.drive_info(Data.instance.AdminId,Data.instance.getUserId())
-                .subscribeOn(Schedulers.io())
-                .unsubscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(subscriber);
+    public <T> T create(final Class<T> service) {
 
+        return (T)RetrofitUtil.getInstance();
     }
-    public void update_coordinate(Map<String, String> param, SubscriberOnNextListener<BaseResponse> onNextListener){
-        ProgressSubscriber<BaseResponse> subscriber = new ProgressSubscriber<BaseResponse>(onNextListener);
-        mRetrofit.create(ApiService.class).update_coordinate(param)
-                .subscribeOn(Schedulers.io())
-                .unsubscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(subscriber);
-
+    public void base(SubscriberOnNextListener onNextListener){
+//        Observable ob = mRetrofit.create(ApiUserService.class).getuserinfo(Data.instance.AdminId,Data.instance.getUserId());
+        if (observable != null) {
+            observable.subscribeOn(Schedulers.io())
+                    .unsubscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(new ProgressSubscriber(onNextListener));
+        }
+    }
+    public void base(SubscriberOnNextListener onNextListener,Context context){
+        if (observable != null) {
+            observable.subscribeOn(Schedulers.io())
+                    .unsubscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(new ProgressSubscriber(onNextListener, context));
+        }
     }
 }

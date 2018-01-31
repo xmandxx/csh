@@ -19,10 +19,15 @@ import com.jude.easyrecyclerview.adapter.RecyclerArrayAdapter;
 import com.jude.easyrecyclerview.decoration.DividerDecoration;
 import com.xmwang.cyh.BaseActivity;
 import com.xmwang.cyh.R;
+import com.xmwang.cyh.api.ApiService;
+import com.xmwang.cyh.api.ApiUserService;
 import com.xmwang.cyh.common.Data;
 import com.xmwang.cyh.common.RetrofitHelper;
 import com.xmwang.cyh.common.SADialog;
 import com.xmwang.cyh.common.event.MyCarEvent;
+import com.xmwang.cyh.common.retrofit.BaseResponse;
+import com.xmwang.cyh.common.retrofit.RetrofitUtil;
+import com.xmwang.cyh.common.retrofit.SubscriberOnNextListener;
 import com.xmwang.cyh.model.BaseModel;
 import com.xmwang.cyh.model.LoveCarModel;
 import com.xmwang.cyh.utils.ToastUtils;
@@ -37,13 +42,14 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import retrofit2.Callback;
 import retrofit2.Response;
+import rx.Observable;
 
 public class MyCarActivity extends BaseActivity {
     @BindView(R.id.erv_list)
     EasyRecyclerView ervList;
     @BindView(R.id.swipe_container)
     SwipeRefreshLayout swipeContainer;
-    private RecyclerArrayAdapter<LoveCarModel.DataBean> adapter;
+    private RecyclerArrayAdapter<LoveCarModel> adapter;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -104,30 +110,23 @@ public class MyCarActivity extends BaseActivity {
         }
     }
     private void setCarStatus(int id,int type){
-        retrofit2.Call<BaseModel> call = RetrofitHelper.instance.getApiUserService().user_cars_status(
+        Observable observable = RetrofitUtil.getInstance().getmRetrofit().create(ApiUserService.class).user_cars_status(
                 Data.instance.AdminId,
                 Data.instance.getUserId(),
                 id,
                 type
         );
-        SADialog.instance.showProgress(this);
-        call.enqueue(new Callback<BaseModel>() {
-            @Override
-            public void onResponse(retrofit2.Call<BaseModel> call, Response<BaseModel> response) {
-                SADialog.instance.hideProgress();
-                BaseModel model = response.body();
-                ToastUtils.getInstance().toastShow(model.getMessage());
-                if (model.getCode() != RetrofitHelper.instance.SUCCESS_CODE) {
-                    return;
-                }
-                getList();
-            }
+        RetrofitUtil.getInstance()
+                .setObservable(observable)
+                .base(new SubscriberOnNextListener<BaseResponse>() {
+                    @Override
+                    public void onNext(BaseResponse baseResponse) {
+                        if (baseResponse.isSuccess()) {
+                            getList();
+                        }
 
-            @Override
-            public void onFailure(retrofit2.Call<BaseModel> call, Throwable t) {
-                SADialog.instance.hideProgress();
-            }
-        });
+                    }
+                });
     }
     private void init(){
         swipeContainer.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
@@ -150,7 +149,7 @@ public class MyCarActivity extends BaseActivity {
         itemDecoration.setDrawLastItem(false);
         ervList.addItemDecoration(itemDecoration);
 
-        ervList.setAdapterWithProgress(adapter = new RecyclerArrayAdapter<LoveCarModel.DataBean>(this) {
+        ervList.setAdapterWithProgress(adapter = new RecyclerArrayAdapter<LoveCarModel>(this) {
             @Override
             public BaseViewHolder OnCreateViewHolder(ViewGroup parent, int viewType) {
                 return new MyCarHolder(parent);
@@ -160,32 +159,25 @@ public class MyCarActivity extends BaseActivity {
         getList();
     }
     private void getList(){
-        retrofit2.Call<LoveCarModel> call = RetrofitHelper.instance.getApiUserService().user_cars_list(
+        Observable observable = RetrofitUtil.getInstance().getmRetrofit().create(ApiUserService.class).user_cars_list(
                 Data.instance.AdminId,
                 Data.instance.getUserId(),
                 20,
                 1
         );
+        RetrofitUtil.getInstance()
+                .setObservable(observable)
+                .base(new SubscriberOnNextListener<BaseResponse<LoveCarModel>>() {
+                    @Override
+                    public void onNext(BaseResponse<LoveCarModel> baseResponse) {
+                        swipeContainer.setRefreshing(false);
+                        adapter.clear();
+                        if (baseResponse.getDataList()!=null) {
+                            adapter.addAll(baseResponse.getDataList());
+                        }
 
-        call.enqueue(new Callback<LoveCarModel>() {
-            @Override
-            public void onResponse(retrofit2.Call<LoveCarModel> call, Response<LoveCarModel> response) {
-                swipeContainer.setRefreshing(false);
-                adapter.clear();
-                LoveCarModel model = response.body();
-                if (model.getCode() != RetrofitHelper.instance.SUCCESS_CODE) {
-                    return;
-                }
-                if (model.getData().size() > 0) {
-                    adapter.addAll(model.getData());
-                }
-            }
-
-            @Override
-            public void onFailure(retrofit2.Call<LoveCarModel> call, Throwable t) {
-                swipeContainer.setRefreshing(false);
-            }
-        });
+                    }
+                },this);
     }
     private void addCar(){
 

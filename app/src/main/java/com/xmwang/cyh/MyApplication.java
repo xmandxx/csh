@@ -9,6 +9,7 @@ import com.amap.api.location.AMapLocation;
 import com.amap.api.location.AMapLocationClient;
 import com.amap.api.location.AMapLocationClientOption;
 import com.amap.api.location.AMapLocationListener;
+import com.xmwang.cyh.api.ApiService;
 import com.xmwang.cyh.common.Data;
 import com.xmwang.cyh.common.RetrofitHelper;
 import com.xmwang.cyh.common.retrofit.BaseResponse;
@@ -16,6 +17,7 @@ import com.xmwang.cyh.common.retrofit.RetrofitUtil;
 import com.xmwang.cyh.common.retrofit.SubscriberOnNextListener;
 import com.xmwang.cyh.model.BaseModel;
 import com.xmwang.cyh.model.DriveInfoModel;
+import com.xmwang.cyh.utils.ToastUtils;
 
 import java.util.HashMap;
 import java.util.List;
@@ -31,10 +33,10 @@ import retrofit2.Response;
  * @author: CTS
  * @date: 2017/2/16 10:36
  */
-public class MyApplication extends Application implements AMapLocationListener{
+public class MyApplication extends Application implements AMapLocationListener {
     private static MyApplication mcontext;
     public static MyApplication instances;
-//    /**
+    //    /**
 //     * GreenDao相关
 //     */
 //    private DaoMaster.DevOpenHelper mHelper;
@@ -57,6 +59,7 @@ public class MyApplication extends Application implements AMapLocationListener{
     private AMapLocationClient mLocationClient = null;
     //声明AMapLocationClientOption对象
     private AMapLocationClientOption mLocationOption = null;
+
     @Override
     public void onCreate() {
         super.onCreate();
@@ -117,14 +120,15 @@ public class MyApplication extends Application implements AMapLocationListener{
     public static Context getContext() {
         return mcontext;
     }
-    private void initAmap(){
+
+    private void initAmap() {
         if (mLocationClient == null) {
             //初始化定位
             mLocationClient = new AMapLocationClient(getApplicationContext());
             //设置定位回调监听
             mLocationClient.setLocationListener(this);
         }
-        if (mLocationOption == null){
+        if (mLocationOption == null) {
             //初始化AMapLocationClientOption对象
             mLocationOption = new AMapLocationClientOption();
             //设置定位模式为AMapLocationMode.Hight_Accuracy，高精度模式。
@@ -135,7 +139,7 @@ public class MyApplication extends Application implements AMapLocationListener{
             mLocationOption.setNeedAddress(false);
         }
         mLocationOption.setLocationPurpose(AMapLocationClientOption.AMapLocationPurpose.Transport);
-        if(null != mLocationClient){
+        if (null != mLocationClient) {
             mLocationClient.setLocationOption(mLocationOption);
             //设置场景模式后最好调用一次stop，再调用start以保证场景模式生效
             mLocationClient.stopLocation();
@@ -143,7 +147,8 @@ public class MyApplication extends Application implements AMapLocationListener{
         }
 
     }
-    public void startLocation(){
+
+    public void startLocation() {
         if (mLocationClient != null) {
             mLocationClient.startLocation();
         }
@@ -153,25 +158,27 @@ public class MyApplication extends Application implements AMapLocationListener{
     public void onLocationChanged(AMapLocation amapLocation) {
         if (amapLocation != null) {
             if (amapLocation.getErrorCode() == 0) {
-                Log.e("AmapError","location Error, getLongitude:"
+                Log.e("AmapError", "location Error, getLongitude:"
                         + amapLocation.getLongitude() + ", getLatitude:"
                         + amapLocation.getLatitude());
                 //可在其中解析amapLocation获取相应内容。
-                Map<String,String> param = new HashMap<>();
-                param.put("admin_id",Data.instance.AdminId);
-                param.put("user_id",Data.instance.getUserId());
-                param.put("longitude",amapLocation.getLongitude()+"");
-                param.put("latitude",amapLocation.getLatitude()+"");
-                RetrofitUtil.getInstance().update_coordinate(param,new SubscriberOnNextListener<BaseResponse>() {
-                    @Override
-                    public void onNext(BaseResponse listBaseResponse) {
-                        Log.e("AmapError","update_coordinate:code:"
-                                + listBaseResponse.code);
-                    }
-                });
-            }else {
+                Map<String, String> param = new HashMap<>();
+                param.put("admin_id", Data.instance.AdminId);
+                param.put("user_id", Data.instance.getUserId());
+                param.put("longitude", amapLocation.getLongitude() + "");
+                param.put("latitude", amapLocation.getLatitude() + "");
+                RetrofitUtil
+                        .getInstance()
+                        .setObservable(RetrofitUtil.getInstance().getmRetrofit().create(ApiService.class).update_coordinate(param))
+                        .base(new SubscriberOnNextListener<BaseResponse>() {
+                            @Override
+                            public void onNext(BaseResponse baseResponse) {
+//                                ToastUtils.getInstance().toastShow(baseResponse.message);
+                            }
+                        });
+            } else {
                 //定位失败时，可通过ErrCode（错误码）信息来确定失败的原因，errInfo是错误信息，详见错误码表。
-                Log.e("AmapError","location Error, ErrCode:"
+                Log.e("AmapError", "location Error, ErrCode:"
                         + amapLocation.getErrorCode() + ", errInfo:"
                         + amapLocation.getErrorInfo());
             }

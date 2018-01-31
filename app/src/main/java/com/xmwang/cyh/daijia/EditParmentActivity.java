@@ -22,10 +22,15 @@ import com.xmwang.cyh.common.Common;
 import com.xmwang.cyh.common.Data;
 import com.xmwang.cyh.common.FlexRadioGroup;
 import com.xmwang.cyh.common.RetrofitHelper;
+import com.xmwang.cyh.common.retrofit.BaseResponse;
+import com.xmwang.cyh.common.retrofit.RetrofitUtil;
+import com.xmwang.cyh.common.retrofit.SubscriberOnNextListener;
 import com.xmwang.cyh.model.Charging;
 import com.xmwang.cyh.utils.ToastUtils;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -84,54 +89,34 @@ public class EditParmentActivity extends BaseActivity implements RadioGroup.OnCh
     private void init() {
         rdoGorup.setOnCheckedChangeListener(this);
 
-        //注册广播
-        IntentFilter filter = new IntentFilter();
-        filter.addAction("com.overorder");
-        registerReceiver(mReceiver, filter);
         double pvalue = Data.instance.getPercentage() * 100;
-        if (pvalue == 100){
+        if (pvalue == 100) {
             rdoGorup.check(rdo100.getId());
         }
-        if (pvalue == 120){
+        if (pvalue == 120) {
             rdoGorup.check(rdo120.getId());
         }
-        if (pvalue == 150){
+        if (pvalue == 150) {
             rdoGorup.check(rdo150.getId());
         }
     }
 
     private void loadData() {
-        Call<Charging> call = RetrofitHelper.instance
-                .getApiService()
-                .charging(Data.instance.AdminId, Data.instance.getUserId());
-        call.enqueue(new Callback<Charging>() {
-            @Override
-            public void onResponse(Call<Charging> call, Response<Charging> response) {
-                Charging charging = response.body();
-                setRaidBtn(charging.getData());
-            }
-
-            @Override
-            public void onFailure(Call<Charging> call, Throwable t) {
-
-            }
-        });
+        RetrofitUtil.getInstance()
+                .setObservable(RetrofitUtil.getInstance().getmRetrofit().create(ApiService.class).charging(Data.instance.AdminId, Data.instance.getUserId()))
+                .base(new SubscriberOnNextListener<BaseResponse<Charging>>() {
+                    @Override
+                    public void onNext(BaseResponse<Charging> baseResponse) {
+                        if (baseResponse.getDataList() != null){
+                            setRaidBtn(baseResponse.getDataList());
+                        }
+                    }
+                });
     }
-
-    /**
-     * 广播接收
-     */
-    private BroadcastReceiver mReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            finish();
-        }
-    };
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        unregisterReceiver(mReceiver);
     }
 
     @OnClick({R.id.title_back, R.id.title_right_img, R.id.rdo_gorup, R.id.rdo_temp_group, R.id.btn_setting_temp, R.id.btn_add_order})
@@ -142,21 +127,23 @@ public class EditParmentActivity extends BaseActivity implements RadioGroup.OnCh
                 break;
             case R.id.title_right_img:
 //                Log.e("xmwang", String.valueOf(chargingId));
+                save();
                 break;
             case R.id.btn_setting_temp:
                 startActivity(new Intent(this, TempListActivity.class));
                 break;
             case R.id.btn_add_order:
                 //创建订单
-                if (!Data.instance.getIsOnline()){
+                if (!Data.instance.getIsOnline()) {
                     ToastUtils.getInstance().toastShow("请先上线");
                     return;
                 }
-                if (Double.valueOf(Data.instance.getDriveInfo().getDriver_money()) < Data.instance.getDriveInfo().getDriver_min_money()){
-                    ToastUtils.getInstance().toastShow("余额不足，接单最低需要"+Data.instance.getDriveInfo().getDriver_min_money()+"元");
+                if (Double.valueOf(Data.instance.getDriveInfo().getDriver_money()) < Data.instance.getDriveInfo().getDriver_min_money()) {
+                    ToastUtils.getInstance().toastShow("余额不足，接单最低需要" + Data.instance.getDriveInfo().getDriver_min_money() + "元");
                     return;
                 }
                 startActivity(new Intent(this, CreateDJOrderActivity.class));
+                finish();
                 break;
         }
     }
@@ -167,16 +154,16 @@ public class EditParmentActivity extends BaseActivity implements RadioGroup.OnCh
 //        Log.e("xmwang", String.valueOf(i));
         Log.e("xmwang", "我是rdoGorup");
         RadioButton radioButton = (RadioButton) radioGroup.findViewById(i);
-        Data.instance.setPercentage(Double.valueOf(radioButton.getText().toString().replace("%","")) / 100);
+        Data.instance.setPercentage(Double.valueOf(radioButton.getText().toString().replace("%", "")) / 100);
     }
 
-    private void setRaidBtn(List<Charging.DataBean> data) {
+    private void setRaidBtn(List<Charging> data) {
         if (null == data) {
             return;
         }
         int width = (Common.getWindowWidth(this) - Common.dp2px(this, 40)) / 3 - 10;
         for (int i = 0; i < data.size(); i++) {
-            Charging.DataBean model = data.get(i);
+            Charging model = data.get(i);
             RadioButton radioButton = new RadioButton(this);
             //去除圆点
             radioButton.setButtonDrawable(0);
@@ -213,5 +200,29 @@ public class EditParmentActivity extends BaseActivity implements RadioGroup.OnCh
             }
 
         }
+    }
+
+    private void save() {
+        Map<String, String> param = new HashMap<>();
+        param.put("admin_id", Data.instance.AdminId);
+        param.put("user_id", Data.instance.getUserId());
+        param.put("charging_id", String.valueOf(Data.instance.getChargingId()));
+        param.put("percentage", String.valueOf(Data.instance.getPercentage()));
+        RetrofitUtil.getInstance()
+                .setObservable(RetrofitUtil.getInstance().getmRetrofit().create(ApiService.class).setDefaultTemp(param))
+                .base(new SubscriberOnNextListener<BaseResponse>() {
+                    @Override
+                    public void onNext(BaseResponse baseResponse) {
+                        ToastUtils.getInstance().toastShow(baseResponse.message);
+                    }
+                });
+//        RetrofitUtil.getInstance().setDefaultTemp(param,new SubscriberOnNextListener<BaseResponse>() {
+//            @Override
+//            public void onNext(BaseResponse baseResponse) {
+//                if (baseResponse != null){
+//                    ToastUtils.getInstance().toastShow(baseResponse.message);
+//                }
+//            }
+//        });
     }
 }

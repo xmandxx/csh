@@ -8,41 +8,7 @@ import java.util.List;
 
 public class OrderModel {
 
-    /**
-     * code : 200
-     * message : 获取成功
-     * data : [{"order_id":110,"goods_name":"强暴鸡米花","goods_price":"8.50","goods_number":67,"goods_amount":"569.50","original_img":"images/201704/source_img/632_G_1493164159319.jpg","supplier_name":"shop","order_type":1},{"order_id":111,"goods_name":"强暴鸡米花","goods_price":"16.00","goods_number":1,"goods_amount":"16.00","original_img":"images/201704/source_img/632_G_1493164159319.jpg","supplier_name":"shop","order_type":1},{"order_id":112,"goods_name":"脆皮炸鸡","goods_price":"12.00","goods_number":3,"goods_amount":"36.00","original_img":"images/201709/source_img/630_G_1504543146909.jpg","supplier_name":"shop","order_type":1}]
-     */
 
-    private int code;
-    private String message;
-    private List<DataBean> data;
-
-    public int getCode() {
-        return code;
-    }
-
-    public void setCode(int code) {
-        this.code = code;
-    }
-
-    public String getMessage() {
-        return message;
-    }
-
-    public void setMessage(String message) {
-        this.message = message;
-    }
-
-    public List<DataBean> getData() {
-        return data;
-    }
-
-    public void setData(List<DataBean> data) {
-        this.data = data;
-    }
-
-    public static class DataBean {
         /**
          * order_id : 110
          * goods_name : 强暴鸡米花
@@ -126,5 +92,5 @@ public class OrderModel {
         public void setOrder_type(int order_type) {
             this.order_type = order_type;
         }
-    }
+
 }

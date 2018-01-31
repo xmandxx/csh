@@ -8,41 +8,7 @@ import java.util.List;
 
 public class TopNews {
 
-    /**
-     * code : 200
-     * message : 头条新闻
-     * data : [{"article_id":139,"title":"郑州一日游"},{"article_id":20,"title":"商家服务"}]
-     */
 
-    private int code;
-    private String message;
-    private List<DataBean> data;
-
-    public int getCode() {
-        return code;
-    }
-
-    public void setCode(int code) {
-        this.code = code;
-    }
-
-    public String getMessage() {
-        return message;
-    }
-
-    public void setMessage(String message) {
-        this.message = message;
-    }
-
-    public List<DataBean> getData() {
-        return data;
-    }
-
-    public void setData(List<DataBean> data) {
-        this.data = data;
-    }
-
-    public static class DataBean {
         /**
          * article_id : 139
          * title : 郑州一日游
@@ -66,5 +32,5 @@ public class TopNews {
         public void setTitle(String title) {
             this.title = title;
         }
-    }
+
 }

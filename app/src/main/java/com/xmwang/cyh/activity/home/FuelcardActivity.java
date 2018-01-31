@@ -21,10 +21,15 @@ import com.tencent.mm.opensdk.openapi.IWXAPI;
 import com.tencent.mm.opensdk.openapi.WXAPIFactory;
 import com.xmwang.cyh.BaseActivity;
 import com.xmwang.cyh.R;
+import com.xmwang.cyh.api.ApiHomeService;
+import com.xmwang.cyh.api.ApiPayService;
 import com.xmwang.cyh.common.Common;
 import com.xmwang.cyh.common.Data;
 import com.xmwang.cyh.common.PayResult;
 import com.xmwang.cyh.common.RetrofitHelper;
+import com.xmwang.cyh.common.retrofit.BaseResponse;
+import com.xmwang.cyh.common.retrofit.RetrofitUtil;
+import com.xmwang.cyh.common.retrofit.SubscriberOnNextListener;
 import com.xmwang.cyh.daijia.AccActivity;
 import com.xmwang.cyh.model.AlipayModel;
 import com.xmwang.cyh.model.BaseModel;
@@ -39,6 +44,7 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import retrofit2.Callback;
 import retrofit2.Response;
+import rx.Observable;
 
 public class FuelcardActivity extends BaseActivity {
 
@@ -130,66 +136,59 @@ public class FuelcardActivity extends BaseActivity {
     }
     int payType = 0;
     private void pay() {
-        RetrofitHelper.instance.getApiHomeService().fuelcard(
+        Observable observable = RetrofitUtil.getInstance().getmRetrofit().create(ApiHomeService.class).fuelcard(
                 Data.instance.AdminId,
                 Data.instance.getUserId(),
 //                txtPhone.getText().toString().trim(),
                 txtNumber.getText().toString().trim(),
                 original_price,
                 money
-        ).enqueue(new Callback<BaseModel>() {
-            @Override
-            public void onResponse(retrofit2.Call<BaseModel> call, Response<BaseModel> response) {
-                BaseModel model = response.body();
-                if (model == null){
-                    ToastUtils.getInstance().toastShow("网络错误");
-                    return;
-                }
-                if (model.getCode() == 403) {
-                    AlertDialog.Builder builder = new AlertDialog.Builder(FuelcardActivity.this);
-                    builder.setTitle("余额不足，请选择支付方式");
-                    final String[] payTypes = {"微信", "支付宝"};
+        );
+        RetrofitUtil.getInstance()
+                .setObservable(observable)
+                .base(new SubscriberOnNextListener<BaseResponse>() {
+                    @Override
+                    public void onNext(BaseResponse baseResponse) {
+                        if (baseResponse.code == 403) {
+                            AlertDialog.Builder builder = new AlertDialog.Builder(FuelcardActivity.this);
+                            builder.setTitle("余额不足，请选择支付方式");
+                            final String[] payTypes = {"微信", "支付宝"};
 
-                    //    设置一个单项选择下拉框
-                    /**
-                     * 第一个参数指定我们要显示的一组下拉单选框的数据集合
-                     * 第二个参数代表索引，指定默认哪一个单选框被勾选上，1表示默认'女' 会被勾选上
-                     * 第三个参数给每一个单选项绑定一个监听器
-                     */
-                    builder.setSingleChoiceItems(payTypes, payType, new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            payType = which;
-                        }
-                    }).setPositiveButton("确定", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            if (payType == 0) {
-                                wxPay();
-                            } else {
-                                aliPay();
-                            }
-                        }
-                    }).setNegativeButton("取消", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
+                            //    设置一个单项选择下拉框
+                            /**
+                             * 第一个参数指定我们要显示的一组下拉单选框的数据集合
+                             * 第二个参数代表索引，指定默认哪一个单选框被勾选上，1表示默认'女' 会被勾选上
+                             * 第三个参数给每一个单选项绑定一个监听器
+                             */
+                            builder.setSingleChoiceItems(payTypes, payType, new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    payType = which;
+                                }
+                            }).setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    if (payType == 0) {
+                                        wxPay();
+                                    } else {
+                                        aliPay();
+                                    }
+                                }
+                            }).setNegativeButton("取消", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
 
+                                }
+                            }).show();
+                            return;
                         }
-                    }).show();
-                    return;
-                }
-                ToastUtils.getInstance().toastShow(model.getMessage());
-            }
-
-            @Override
-            public void onFailure(retrofit2.Call<BaseModel> call, Throwable t) {
-                ToastUtils.getInstance().toastShow("网络错误");
-            }
-        });
+                        ToastUtils.getInstance().toastShow(baseResponse.message);
+                    }
+                },this);
     }
 
     private void wxPay() {
-        retrofit2.Call<WXPayModel> call = RetrofitHelper.instance.getApiPayService().weixin_pay(
+        Observable observable = RetrofitUtil.getInstance().getmRetrofit().create(ApiPayService.class).weixin_pay(
                 Data.instance.AdminId,
                 Data.instance.getUserId(),
                 1,
@@ -198,38 +197,29 @@ public class FuelcardActivity extends BaseActivity {
                 original_price,
                 money
         );
-
-        call.enqueue(new Callback<WXPayModel>() {
-            @Override
-            public void onResponse(retrofit2.Call<WXPayModel> call, Response<WXPayModel> response) {
-                WXPayModel model = response.body();
-                if (model == null){
-                    return;
-                }
-                if (model.getCode() != RetrofitHelper.instance.SUCCESS_CODE || model.getData().size() == 0) {
-                    return;
-                }
-                WXPayModel.DataBean m = model.getData().get(0);
-                PayReq request = new PayReq();
-                request.appId = Data.instance.WXKEY;
-                request.partnerId = m.getPartnerid();
-                request.prepayId = m.getPrepayid();
-                request.packageValue = "Sign=WXPay";
-                request.nonceStr = m.getNoncestr();
-                request.timeStamp = String.valueOf(m.getTimestamp());
-                request.sign = m.getSign();
-                msgApi.sendReq(request);
-            }
-
-            @Override
-            public void onFailure(retrofit2.Call<WXPayModel> call, Throwable t) {
-                ToastUtils.getInstance().toastShow("网络错误");
-            }
-        });
+        RetrofitUtil.getInstance()
+                .setObservable(observable)
+                .base(new SubscriberOnNextListener<BaseResponse<WXPayModel>>() {
+                    @Override
+                    public void onNext(BaseResponse<WXPayModel> baseResponse) {
+                        if (baseResponse.getDataInfo() != null){
+                            WXPayModel m = baseResponse.getDataInfo();
+                            PayReq request = new PayReq();
+                            request.appId = Data.instance.WXKEY;
+                            request.partnerId = m.getPartnerid();
+                            request.prepayId = m.getPrepayid();
+                            request.packageValue = "Sign=WXPay";
+                            request.nonceStr = m.getNoncestr();
+                            request.timeStamp = String.valueOf(m.getTimestamp());
+                            request.sign = m.getSign();
+                            msgApi.sendReq(request);
+                        }
+                    }
+                },this);
     }
 
     private void aliPay() {
-        RetrofitHelper.instance.getApiPayService().alipay_pay(
+        Observable observable = RetrofitUtil.getInstance().getmRetrofit().create(ApiPayService.class).alipay_pay(
                 Data.instance.AdminId,
                 Data.instance.getUserId(),
                 1,
@@ -237,39 +227,32 @@ public class FuelcardActivity extends BaseActivity {
                 txtNumber.getText().toString(),
                 original_price,
                 money
-        ).enqueue(new Callback<AlipayModel>() {
-            @Override
-            public void onResponse(retrofit2.Call<AlipayModel> call, Response<AlipayModel> response) {
-                AlipayModel model = response.body();
-                if (model == null){
-                    return;
-                }
-                if (model.getCode() != RetrofitHelper.instance.SUCCESS_CODE || model.getData().size() == 0) {
-                    return;
-                }
-                final AlipayModel.DataBean m = model.getData().get(0);
-                Runnable payRunnable = new Runnable() {
+        );
+        RetrofitUtil.getInstance()
+                .setObservable(observable)
+                .base(new SubscriberOnNextListener<BaseResponse<AlipayModel>>() {
                     @Override
-                    public void run() {
-                        PayTask alipay = new PayTask(FuelcardActivity.this);
-                        Map<String, String> result = alipay.payV2(m.getOrderstr(),true);
+                    public void onNext(BaseResponse<AlipayModel> baseResponse) {
+                        if (baseResponse.getDataInfo() != null){
+                            final AlipayModel m = baseResponse.getDataInfo();
+                            Runnable payRunnable = new Runnable() {
+                                @Override
+                                public void run() {
+                                    PayTask alipay = new PayTask(FuelcardActivity.this);
+                                    Map<String, String> result = alipay.payV2(m.getOrderstr(),true);
 
-                        Message msg = new Message();
-                        msg.what = 1;
-                        msg.obj = result;
-                        mHandler.sendMessage(msg);
+                                    Message msg = new Message();
+                                    msg.what = 1;
+                                    msg.obj = result;
+                                    mHandler.sendMessage(msg);
+                                }
+                            };
+                            // 必须异步调用
+                            Thread payThread = new Thread(payRunnable);
+                            payThread.start();
+                        }
                     }
-                };
-                // 必须异步调用
-                Thread payThread = new Thread(payRunnable);
-                payThread.start();
-            }
-
-            @Override
-            public void onFailure(retrofit2.Call<AlipayModel> call, Throwable t) {
-                ToastUtils.getInstance().toastShow("网络错误");
-            }
-        });
+                },this);
     }
     @SuppressLint("HandlerLeak")
     private Handler mHandler = new Handler() {

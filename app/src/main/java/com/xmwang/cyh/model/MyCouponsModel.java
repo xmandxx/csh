@@ -8,41 +8,7 @@ import java.util.List;
 
 public class MyCouponsModel {
 
-    /**
-     * code : 200
-     * message : 获取成功
-     * data : [{"add_time":"2017-05-27","coupon_id":6,"user_coupon_id":2,"is_default":0,"coupon_name":"消费满30元优惠2元","coupon_type":0,"start_time":"2017-04-26","end_time":"2017-05-30","coupon_pic":"/data/favourable_action_pic/coupon9/original9_6_580x260.jpg","min_amount":"30.00","max_amount":"0.00","discount":"2.00","supplier_id":9},{"add_time":"2017-05-31","coupon_id":5,"user_coupon_id":3,"is_default":0,"coupon_name":"消费满20元优惠1元","coupon_type":0,"start_time":"2017-04-26","end_time":"2017-06-29","coupon_pic":"/data/favourable_action_pic/coupon9/original9_5_580x260.jpg","min_amount":"20.00","max_amount":"0.00","discount":"1.00","supplier_id":9},{"add_time":"2017-05-31","coupon_id":7,"user_coupon_id":4,"is_default":0,"coupon_name":"shop优惠券","coupon_type":0,"start_time":"2017-05-31","end_time":"2017-06-03","coupon_pic":"/data/favourable_action_pic/coupon9/original9_7_580x260.jpg","min_amount":"50.00","max_amount":"0.00","discount":"10.00","supplier_id":9}]
-     */
 
-    private int code;
-    private String message;
-    private List<DataBean> data;
-
-    public int getCode() {
-        return code;
-    }
-
-    public void setCode(int code) {
-        this.code = code;
-    }
-
-    public String getMessage() {
-        return message;
-    }
-
-    public void setMessage(String message) {
-        this.message = message;
-    }
-
-    public List<DataBean> getData() {
-        return data;
-    }
-
-    public void setData(List<DataBean> data) {
-        this.data = data;
-    }
-
-    public static class DataBean {
         /**
          * add_time : 2017-05-27
          * coupon_id : 6
@@ -176,5 +142,5 @@ public class MyCouponsModel {
         public void setSupplier_id(int supplier_id) {
             this.supplier_id = supplier_id;
         }
-    }
+
 }

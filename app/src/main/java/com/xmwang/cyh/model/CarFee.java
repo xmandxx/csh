@@ -8,41 +8,7 @@ import java.util.List;
 
 public class CarFee {
 
-    /**
-     * code : 200
-     * message : 获取成功
-     * data : [{"date":"01-16","fee_type":1,"fee_title":"维修","fee_money":"130.00"},{"date":"01-16","fee_type":2,"fee_title":"保险","fee_money":"3600.27"}]
-     */
 
-    private int code;
-    private String message;
-    private List<DataBean> data;
-
-    public int getCode() {
-        return code;
-    }
-
-    public void setCode(int code) {
-        this.code = code;
-    }
-
-    public String getMessage() {
-        return message;
-    }
-
-    public void setMessage(String message) {
-        this.message = message;
-    }
-
-    public List<DataBean> getData() {
-        return data;
-    }
-
-    public void setData(List<DataBean> data) {
-        this.data = data;
-    }
-
-    public static class DataBean {
         /**
          * date : 01-16
          * fee_type : 1
@@ -86,5 +52,5 @@ public class CarFee {
         public void setFee_money(String fee_money) {
             this.fee_money = fee_money;
         }
-    }
+
 }

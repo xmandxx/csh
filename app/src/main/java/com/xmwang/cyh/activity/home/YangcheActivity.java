@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
+import android.os.Message;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
@@ -15,27 +16,36 @@ import android.view.ViewGroup;
 import android.widget.DatePicker;
 import android.widget.TextView;
 
+import com.alipay.sdk.app.PayTask;
 import com.jude.easyrecyclerview.EasyRecyclerView;
 import com.jude.easyrecyclerview.adapter.BaseViewHolder;
 import com.jude.easyrecyclerview.adapter.RecyclerArrayAdapter;
 import com.jude.easyrecyclerview.decoration.DividerDecoration;
 import com.xmwang.cyh.BaseActivity;
 import com.xmwang.cyh.R;
+import com.xmwang.cyh.api.ApiHomeService;
+import com.xmwang.cyh.api.ApiPayService;
+import com.xmwang.cyh.api.ApiUserService;
 import com.xmwang.cyh.common.Common;
 import com.xmwang.cyh.common.Data;
 import com.xmwang.cyh.common.RetrofitHelper;
 import com.xmwang.cyh.common.SADialog;
+import com.xmwang.cyh.common.retrofit.BaseResponse;
+import com.xmwang.cyh.common.retrofit.RetrofitUtil;
+import com.xmwang.cyh.common.retrofit.SubscriberOnNextListener;
 import com.xmwang.cyh.model.CarFee;
 import com.xmwang.cyh.viewholder.CarFeeHolder;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Map;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import retrofit2.Callback;
 import retrofit2.Response;
+import rx.Observable;
 
 public class YangcheActivity extends BaseActivity {
 
@@ -46,7 +56,8 @@ public class YangcheActivity extends BaseActivity {
     @BindView(R.id.erv_list)
     EasyRecyclerView ervList;
     private Calendar calendar;
-    private RecyclerArrayAdapter<CarFee.DataBean> adapter;
+    private RecyclerArrayAdapter<CarFee> adapter;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -75,6 +86,7 @@ public class YangcheActivity extends BaseActivity {
                 break;
         }
     }
+
     @Override
     protected void onDestroy() {
         super.onDestroy();
@@ -82,7 +94,7 @@ public class YangcheActivity extends BaseActivity {
         SADialog.instance.hideProgress();
     }
 
-    private void init(){
+    private void init() {
         //注册广播
         IntentFilter filter = new IntentFilter();
         filter.addAction("com.YangcheActivity");
@@ -99,7 +111,7 @@ public class YangcheActivity extends BaseActivity {
         itemDecoration.setDrawLastItem(false);
         ervList.addItemDecoration(itemDecoration);
 
-        ervList.setAdapterWithProgress(adapter = new RecyclerArrayAdapter<CarFee.DataBean>(this) {
+        ervList.setAdapterWithProgress(adapter = new RecyclerArrayAdapter<CarFee>(this) {
             @Override
             public BaseViewHolder OnCreateViewHolder(ViewGroup parent, int viewType) {
                 return new CarFeeHolder(parent);
@@ -108,6 +120,7 @@ public class YangcheActivity extends BaseActivity {
 
         getList();
     }
+
     /**
      * 广播接收
      */
@@ -139,39 +152,26 @@ public class YangcheActivity extends BaseActivity {
         }
     }
 
-    private void getList(){
-        SADialog.instance.showProgress(this);
-        retrofit2.Call<CarFee> call = RetrofitHelper.instance.getApiHomeService().get_car_fee(
+    private void getList() {
+//        SADialog.instance.showProgress(this);
+        Observable observable = RetrofitUtil.getInstance().getmRetrofit().create(ApiHomeService.class).get_car_fee(
                 Data.instance.AdminId,
                 Data.instance.getUserId(),
-                txtTime.getText().toString().replace("年","-").replace("月","")
+                txtTime.getText().toString().replace("年", "-").replace("月", "")
         );
-
-        call.enqueue(new Callback<CarFee>() {
-            @Override
-            public void onResponse(retrofit2.Call<CarFee> call, Response<CarFee> response) {
-                SADialog.instance.hideProgress();
-                adapter.clear();
-                txtMoney.setText("0");
-                CarFee model = response.body();
-                if (model.getCode() != RetrofitHelper.instance.SUCCESS_CODE) {
-                    return;
-                }
-                if (model.getData().size() > 0) {
-                    adapter.addAll(model.getData());
-                    Double money = 0.00;
-                    for (CarFee.DataBean m : model.getData()) {
-                        money += Double.valueOf(m.getFee_money());
+        RetrofitUtil.getInstance()
+                .setObservable(observable)
+                .base(new SubscriberOnNextListener<BaseResponse<CarFee>>() {
+                    @Override
+                    public void onNext(BaseResponse<CarFee> baseResponse) {
+                        adapter.addAll(baseResponse.getDataList());
+                        Double money = 0.00;
+                        for (CarFee m : baseResponse.getDataList()) {
+                            money += Double.valueOf(m.getFee_money());
+                        }
+                        txtMoney.setText(String.valueOf(money));
                     }
-                    txtMoney.setText(String.valueOf(money));
-                }
-            }
-
-            @Override
-            public void onFailure(retrofit2.Call<CarFee> call, Throwable t) {
-                SADialog.instance.hideProgress();
-            }
-        });
+                }, this);
     }
 
 }

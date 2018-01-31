@@ -14,8 +14,12 @@ import android.widget.TextView;
 
 import com.xmwang.cyh.BaseActivity;
 import com.xmwang.cyh.R;
+import com.xmwang.cyh.api.ApiHomeService;
 import com.xmwang.cyh.common.Data;
 import com.xmwang.cyh.common.RetrofitHelper;
+import com.xmwang.cyh.common.retrofit.BaseResponse;
+import com.xmwang.cyh.common.retrofit.RetrofitUtil;
+import com.xmwang.cyh.common.retrofit.SubscriberOnNextListener;
 import com.xmwang.cyh.model.BaseModel;
 import com.xmwang.cyh.utils.ToastUtils;
 
@@ -28,6 +32,7 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import retrofit2.Callback;
 import retrofit2.Response;
+import rx.Observable;
 
 public class AddYangcheActivity extends BaseActivity {
 
@@ -118,8 +123,7 @@ public class AddYangcheActivity extends BaseActivity {
             ToastUtils.getInstance().toastShow(messageTitle+"不能为空");
             return;
         }
-
-        retrofit2.Call<BaseModel> call = RetrofitHelper.instance.getApiHomeService().add_car_fee(
+        Observable observable = RetrofitUtil.getInstance().getmRetrofit().create(ApiHomeService.class).add_car_fee(
                 Data.instance.AdminId,
                 Data.instance.getUserId(),
                 index,
@@ -128,25 +132,19 @@ public class AddYangcheActivity extends BaseActivity {
                 txtValue1.getText().toString().trim(),
                 titleText.getText().toString().replace(".","-")
         );
-
-        call.enqueue(new Callback<BaseModel>() {
-            @Override
-            public void onResponse(retrofit2.Call<BaseModel> call, Response<BaseModel> response) {
-                BaseModel model = response.body();
-                ToastUtils.getInstance().toastShow(model.getMessage());
-                if (model.getCode() != RetrofitHelper.instance.SUCCESS_CODE) {
-                    return;
-                }
-                Intent intent = new Intent("com.YangcheActivity");
-                sendBroadcast(intent);      //发送广播
-                finish();
-            }
-
-            @Override
-            public void onFailure(retrofit2.Call<BaseModel> call, Throwable t) {
-
-            }
-        });
+        RetrofitUtil.getInstance()
+                .setObservable(observable)
+                .base(new SubscriberOnNextListener<BaseResponse>() {
+                    @Override
+                    public void onNext(BaseResponse baseResponse) {
+                        if (baseResponse.isSuccess()) {
+                            ToastUtils.getInstance().toastShow(baseResponse.message);
+                            Intent intent = new Intent("com.YangcheActivity");
+                            sendBroadcast(intent);      //发送广播
+                            finish();
+                        }
+                    }
+                }, this);
 
     }
     private void chooseTime() {

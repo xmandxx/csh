@@ -8,41 +8,7 @@ import java.util.List;
 
 public class UserInfo {
 
-    /**
-     * code : 200
-     * message : 成功登录
-     * data : [{"user_name":"18937935591","user_id":69,"mobile_phone":"18937935591","admin_id":1,"headimg":"","driver_id":9,"rank_points":0,"user_money":"302.20","sex":1,"real_name":"q我们自1己的","driver_status":1,"collection":0}]
-     */
-
-    private int code;
-    private String message;
-    private List<DataBean> data;
-
-    public int getCode() {
-        return code;
-    }
-
-    public void setCode(int code) {
-        this.code = code;
-    }
-
-    public String getMessage() {
-        return message;
-    }
-
-    public void setMessage(String message) {
-        this.message = message;
-    }
-
-    public List<DataBean> getData() {
-        return data;
-    }
-
-    public void setData(List<DataBean> data) {
-        this.data = data;
-    }
-
-    public static class DataBean {
+//
         /**
          * user_name : 18937935591
          * user_id : 69
@@ -166,5 +132,5 @@ public class UserInfo {
         public void setCollection(int collection) {
             this.collection = collection;
         }
-    }
+
 }

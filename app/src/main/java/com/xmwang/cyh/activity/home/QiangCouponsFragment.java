@@ -14,9 +14,13 @@ import com.jude.easyrecyclerview.adapter.BaseViewHolder;
 import com.jude.easyrecyclerview.adapter.RecyclerArrayAdapter;
 import com.jude.easyrecyclerview.decoration.DividerDecoration;
 import com.xmwang.cyh.R;
+import com.xmwang.cyh.api.ApiHomeService;
 import com.xmwang.cyh.common.Data;
 import com.xmwang.cyh.common.LazyLoadFragment;
 import com.xmwang.cyh.common.RetrofitHelper;
+import com.xmwang.cyh.common.retrofit.BaseResponse;
+import com.xmwang.cyh.common.retrofit.RetrofitUtil;
+import com.xmwang.cyh.common.retrofit.SubscriberOnNextListener;
 import com.xmwang.cyh.model.MyCouponsModel;
 import com.xmwang.cyh.model.QiangCouponsModel;
 import com.xmwang.cyh.viewholder.MyCouponsListHolder;
@@ -27,6 +31,7 @@ import butterknife.ButterKnife;
 import butterknife.Unbinder;
 import retrofit2.Callback;
 import retrofit2.Response;
+import rx.Observable;
 
 /**
  * Created by xmWang on 2018/1/15.
@@ -40,7 +45,7 @@ public class QiangCouponsFragment extends LazyLoadFragment {
     SwipeRefreshLayout swipeContainer;
     Unbinder unbinder;
     private Context context;
-    private RecyclerArrayAdapter<QiangCouponsModel.DataBean> adapter;
+    private RecyclerArrayAdapter<QiangCouponsModel> adapter;
     public QiangCouponsFragment(Context context) {
         this.context = context;
     }
@@ -94,7 +99,7 @@ public class QiangCouponsFragment extends LazyLoadFragment {
         itemDecoration.setDrawLastItem(false);
         ervList.addItemDecoration(itemDecoration);
 
-        ervList.setAdapterWithProgress(adapter = new RecyclerArrayAdapter<QiangCouponsModel.DataBean>(context) {
+        ervList.setAdapterWithProgress(adapter = new RecyclerArrayAdapter<QiangCouponsModel>(context) {
             @Override
             public BaseViewHolder OnCreateViewHolder(ViewGroup parent, int viewType) {
                 return new QiangCouponsListHolder(parent);
@@ -114,30 +119,19 @@ public class QiangCouponsFragment extends LazyLoadFragment {
     }
 
     private void getList(){
-        retrofit2.Call<QiangCouponsModel> call = RetrofitHelper.instance.getApiHomeService().get_coupons(
+        Observable observable = RetrofitUtil.getInstance().getmRetrofit().create(ApiHomeService.class).get_coupons(
                 Data.instance.AdminId,
                 Data.instance.getUserId()
         );
-
-        call.enqueue(new Callback<QiangCouponsModel>() {
-            @Override
-            public void onResponse(retrofit2.Call<QiangCouponsModel> call, Response<QiangCouponsModel> response) {
-                swipeContainer.setRefreshing(false);
-                QiangCouponsModel model = response.body();
-                if (model.getCode() != RetrofitHelper.instance.SUCCESS_CODE) {
-                    return;
-                }
-                if (model.getData().size() > 0) {
-//                    sortList(ls);
-                    adapter.clear();
-                    adapter.addAll(model.getData());
-                }
-            }
-
-            @Override
-            public void onFailure(retrofit2.Call<QiangCouponsModel> call, Throwable t) {
-                swipeContainer.setRefreshing(false);
-            }
-        });
+        RetrofitUtil.getInstance()
+                .setObservable(observable)
+                .base(new SubscriberOnNextListener<BaseResponse<QiangCouponsModel>>() {
+                    @Override
+                    public void onNext(BaseResponse<QiangCouponsModel> baseResponse) {
+                        swipeContainer.setRefreshing(false);
+                        adapter.clear();
+                        adapter.addAll(baseResponse.getDataList());
+                    }
+                },context);
     }
 }

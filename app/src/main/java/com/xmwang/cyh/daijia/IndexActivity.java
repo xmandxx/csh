@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -31,6 +32,7 @@ import com.amap.api.services.geocoder.RegeocodeResult;
 import com.xmwang.cyh.BaseActivity;
 import com.xmwang.cyh.MyApplication;
 import com.xmwang.cyh.R;
+import com.xmwang.cyh.api.ApiService;
 import com.xmwang.cyh.common.Data;
 import com.xmwang.cyh.common.RetrofitHelper;
 import com.xmwang.cyh.common.retrofit.RetrofitUtil;
@@ -64,6 +66,7 @@ import mehdi.sakout.fancybuttons.FancyButton;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
+import rx.Observable;
 
 /**
  * Created by xmwang on 2017/12/19.
@@ -106,14 +109,6 @@ public class IndexActivity extends BaseActivity implements OnMyLocationChangeLis
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_daijia_index);
         ButterKnife.bind(this);
-
-        RetrofitUtil.getInstance().driveInfo(new ProgressSubscriber<BaseResponse<List<DriveInfoModel>>>(new SubscriberOnNextListener<BaseResponse<List<DriveInfoModel>>>() {
-            @Override
-            public void onNext(BaseResponse<List<DriveInfoModel>> listBaseResponse) {
-                Log.e("xmwang","");
-            }
-        },this));
-
         //在activity执行onCreate时执行mMapView.onCreate(savedInstanceState)，创建地图
         mapView.onCreate(savedInstanceState);
         AndPermission.with(this)
@@ -148,24 +143,22 @@ public class IndexActivity extends BaseActivity implements OnMyLocationChangeLis
         // 当popupWindow 正在展示的时候 按下返回键 关闭popupWindow 否则关闭activity
 
         if (GetTime.getInstance().isFastDoubleClick(2000)) {
-            Call<BaseModel> call = RetrofitHelper.instance.getApiService().online(
+            Observable observable = RetrofitUtil.getInstance().getmRetrofit().create(ApiService.class).online(
                     Data.instance.AdminId,
                     Data.instance.getUserId(),
                     "2",
                     String.valueOf(currLocation.getLongitude()),
                     String.valueOf(currLocation.getLatitude())
             );
-            call.enqueue(new Callback<BaseModel>() {
-                @Override
-                public void onResponse(Call<BaseModel> call, Response<BaseModel> response) {
+            RetrofitUtil.getInstance()
+                    .setObservable(observable)
+                    .base(new SubscriberOnNextListener<BaseResponse>() {
+                        @Override
+                        public void onNext(BaseResponse baseResponse) {
 
-                }
+                        }
+                    }, this);
 
-                @Override
-                public void onFailure(Call<BaseModel> call, Throwable t) {
-
-                }
-            });
             ActivityManager.getInstance().removeAllActivity();
         } else {
             ToastUtils.getInstance().toastShow("再按一次退出程序");
@@ -227,32 +220,26 @@ public class IndexActivity extends BaseActivity implements OnMyLocationChangeLis
     }
 
     private void loadNetworkData() {
-        Call<DriveInfo> call = RetrofitHelper.instance.getApiService().driveInfo(Data.instance.AdminId, Data.instance.getUserId());
-        call.enqueue(new Callback<DriveInfo>() {
-            @Override
-            public void onResponse(Call<DriveInfo> call, Response<DriveInfo> response) {
-                DriveInfo driveInfo = response.body();
-                if (driveInfo != null) {
-                    if (driveInfo.getData().size() > 0) {
-                        Data.instance.setDriveInfo(driveInfo.getData().get(0));
-                        txtMoney.setText(Data.instance.getDriveInfo().getDriver_money());
-                        txtDayMoney.setText(Data.instance.getDriveInfo().getDay_get_money());
-                        txtOrderNumber.setText(Data.instance.getDriveInfo().getDay_order_count());
-                        if (driveInfo.getData().get(0).getDriver_status() == 2) {
-                            Data.instance.setOnline(false);
-                        } else {
-                            Data.instance.setOnline(true);
+        Observable observable = RetrofitUtil.getInstance().getmRetrofit().create(ApiService.class).driveInfo(Data.instance.AdminId, Data.instance.getUserId());
+        RetrofitUtil.getInstance()
+                .setObservable(observable)
+                .base(new SubscriberOnNextListener<BaseResponse<DriveInfo>>() {
+                    @Override
+                    public void onNext(BaseResponse<DriveInfo> baseResponse) {
+                        if (baseResponse.getDataInfo() != null){
+                            Data.instance.setDriveInfo(baseResponse.getDataInfo());
+                            txtMoney.setText(Data.instance.getDriveInfo().getDriver_money());
+                            txtDayMoney.setText(Data.instance.getDriveInfo().getDay_get_money());
+                            txtOrderNumber.setText(Data.instance.getDriveInfo().getDay_order_count());
+                            if (baseResponse.getDataInfo().getDriver_status() == 2) {
+                                Data.instance.setOnline(false);
+                            } else {
+                                Data.instance.setOnline(true);
+                            }
                         }
+                        online();
                     }
-                }
-                online();
-            }
-
-            @Override
-            public void onFailure(Call<DriveInfo> call, Throwable t) {
-
-            }
-        });
+                }, this);
     }
 
     @OnClick({R.id.start_location, R.id.ll_end_location, R.id.btn_online, R.id.add_order, R.id.edit_parment, R.id.title_right})
@@ -309,39 +296,31 @@ public class IndexActivity extends BaseActivity implements OnMyLocationChangeLis
     }
 
     private void online() {
-        SADialog.instance.showProgress(this);
+//        SADialog.instance.showProgress(this);
         String ds = Data.instance.getIsOnline() ? "0" : "2";
-        Call<BaseModel> call = RetrofitHelper.instance.getApiService().online(
+        Observable observable = RetrofitUtil.getInstance().getmRetrofit().create(ApiService.class).online(
                 Data.instance.AdminId,
                 Data.instance.getUserId(),
                 ds,
                 String.valueOf(currLocation.getLongitude()),
                 String.valueOf(currLocation.getLatitude())
         );
-        call.enqueue(new Callback<BaseModel>() {
-            @Override
-            public void onResponse(Call<BaseModel> call, Response<BaseModel> response) {
-                BaseModel baseModel = response.body();
-                SADialog.instance.hideProgress();
-                if (baseModel.getCode() != RetrofitHelper.instance.SUCCESS_CODE) {
-                    ToastUtils.getInstance().toastShow(baseModel.getMessage());
-                    return;
-                }
-                if (Data.instance.getIsOnline()) {
-                    btnOnline.setText("点击离线");
-                    btnOnline.setBackgroundColor(Color.parseColor("#98FB98"));
-                } else {
-                    btnOnline.setText("点击上线");
-                    btnOnline.setBackgroundColor(Color.parseColor("#B0C4DE"));
-                }
-            }
-
-            @Override
-            public void onFailure(Call<BaseModel> call, Throwable t) {
-                SADialog.instance.hideProgress();
-                ToastUtils.getInstance().toastShow("操作失败");
-            }
-        });
+        RetrofitUtil.getInstance()
+                .setObservable(observable)
+                .base(new SubscriberOnNextListener<BaseResponse>() {
+                    @Override
+                    public void onNext(BaseResponse baseResponse) {
+                        if (baseResponse.isSuccess()){
+                            if (Data.instance.getIsOnline()) {
+                                btnOnline.setText("点击离线");
+                                btnOnline.setBackgroundColor(Color.parseColor("#98FB98"));
+                            } else {
+                                btnOnline.setText("点击上线");
+                                btnOnline.setBackgroundColor(Color.parseColor("#B0C4DE"));
+                            }
+                        }
+                    }
+                }, this);
     }
 
     public String stringData() {

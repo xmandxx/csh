@@ -8,41 +8,7 @@ import java.util.List;
 
 public class TempInfo {
 
-    /**
-     * code : 200
-     * message : 获取成功
-     * data : [{"charging_id":19,"driver_id":0,"charging":"D模板(一线城市)","wait_time":10,"wait_money":"0.00","ave_time":1,"ave_min_time":1,"ave_minute_money":"1.00","add_time":"2017-12-28 12:40:06","admin_id":1,"is_default":0,"times":[{"time_id":17,"start_amount":"98.00","start_kilometre":10,"average_kilometre":10,"average_amount":"20.00","start_time":0,"end_time":359,"msg":null},{"time_id":14,"start_amount":"38.00","start_kilometre":10,"average_kilometre":10,"average_amount":"20.00","start_time":360,"end_time":1319,"msg":null},{"time_id":15,"start_amount":"58.00","start_kilometre":10,"average_kilometre":10,"average_amount":"20.00","start_time":1320,"end_time":1379,"msg":null},{"time_id":16,"start_amount":"78.00","start_kilometre":10,"average_kilometre":10,"average_amount":"20.00","start_time":1380,"end_time":1439,"msg":null}]}]
-     */
 
-    private int code;
-    private String message;
-    private List<DataBean> data;
-
-    public int getCode() {
-        return code;
-    }
-
-    public void setCode(int code) {
-        this.code = code;
-    }
-
-    public String getMessage() {
-        return message;
-    }
-
-    public void setMessage(String message) {
-        this.message = message;
-    }
-
-    public List<DataBean> getData() {
-        return data;
-    }
-
-    public void setData(List<DataBean> data) {
-        this.data = data;
-    }
-
-    public static class DataBean {
         /**
          * charging_id : 19
          * driver_id : 0
@@ -284,5 +250,5 @@ public class TempInfo {
                 this.msg = msg;
             }
         }
-    }
+
 }

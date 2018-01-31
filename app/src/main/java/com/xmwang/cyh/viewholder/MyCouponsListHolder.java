@@ -26,7 +26,7 @@ import mehdi.sakout.fancybuttons.FancyButton;
  * @Date: 2017/6/14 15:16
  */
 
-public class MyCouponsListHolder extends BaseViewHolder<MyCouponsModel.DataBean> {
+public class MyCouponsListHolder extends BaseViewHolder<MyCouponsModel> {
     ImageView img;
     TextView txtTitle;
     TextView txtTime;
@@ -53,7 +53,7 @@ public class MyCouponsListHolder extends BaseViewHolder<MyCouponsModel.DataBean>
     }
 
     @Override
-    public void setData(final MyCouponsModel.DataBean data) {
+    public void setData(final MyCouponsModel data) {
 
         if (data != null) {
             txtTitle.setText(data.getCoupon_name());

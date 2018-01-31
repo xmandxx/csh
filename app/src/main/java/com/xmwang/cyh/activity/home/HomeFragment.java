@@ -25,11 +25,15 @@ import com.jude.easyrecyclerview.adapter.BaseViewHolder;
 import com.jude.easyrecyclerview.adapter.RecyclerArrayAdapter;
 import com.jude.easyrecyclerview.decoration.DividerDecoration;
 import com.xmwang.cyh.R;
+import com.xmwang.cyh.api.ApiHomeService;
 import com.xmwang.cyh.application.GlideApp;
 import com.xmwang.cyh.common.Common;
 import com.xmwang.cyh.common.Data;
 import com.xmwang.cyh.common.LazyLoadFragment;
 import com.xmwang.cyh.common.RetrofitHelper;
+import com.xmwang.cyh.common.retrofit.BaseResponse;
+import com.xmwang.cyh.common.retrofit.RetrofitUtil;
+import com.xmwang.cyh.common.retrofit.SubscriberOnNextListener;
 import com.xmwang.cyh.daijia.*;
 import com.xmwang.cyh.model.Banner;
 import com.xmwang.cyh.model.NewGoodsList;
@@ -51,6 +55,7 @@ import butterknife.OnClick;
 import butterknife.Unbinder;
 import retrofit2.Callback;
 import retrofit2.Response;
+import rx.Observable;
 
 import static android.app.Activity.RESULT_CANCELED;
 import static android.app.Activity.RESULT_OK;
@@ -73,11 +78,11 @@ public class HomeFragment extends LazyLoadFragment {
     @BindView(R.id.swipe_container)
     SwipeRefreshLayout swipeContainer;
     Unbinder unbinder;
-    private List<Banner.DataBean> lsBanner = new ArrayList<>();
-    private List<Utilities.DataBean> lsActionSort = new ArrayList<>();
-    private List<NewGoodsList.DataBean> lsNewGoodsList = new ArrayList<>();
-    private RecyclerArrayAdapter<Utilities.DataBean> adapterUtilities;
-    private RecyclerArrayAdapter<NewGoodsList.DataBean> adapterNewGoodsList;
+    private List<Banner> lsBanner = new ArrayList<>();
+    private List<Utilities> lsActionSort = new ArrayList<>();
+    private List<NewGoodsList> lsNewGoodsList = new ArrayList<>();
+    private RecyclerArrayAdapter<Utilities> adapterUtilities;
+    private RecyclerArrayAdapter<NewGoodsList> adapterNewGoodsList;
     private Context context;
 
     public HomeFragment(Context context) {
@@ -103,7 +108,7 @@ public class HomeFragment extends LazyLoadFragment {
          * 功能图标
          */
         ervMenu.setLayoutManager(new StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.HORIZONTAL));
-        ervMenu.setAdapter(adapterUtilities = new RecyclerArrayAdapter<Utilities.DataBean>(context) {
+        ervMenu.setAdapter(adapterUtilities = new RecyclerArrayAdapter<Utilities>(context) {
             @Override
             public BaseViewHolder OnCreateViewHolder(ViewGroup parent, int viewType) {
                 //将宽度设置为屏幕的1/4
@@ -128,10 +133,10 @@ public class HomeFragment extends LazyLoadFragment {
 //                        startActivity(intent_buy);
                         break;
                     case 3://油卡充值
-                        startActivity(new Intent(context,FuelcardActivity.class));
+                        startActivity(new Intent(context, FuelcardActivity.class));
                         break;
                     case 4://道路救援
-                        startActivity(new Intent(context,RoadescueActivity.class));
+                        startActivity(new Intent(context, RoadescueActivity.class));
                         break;
                     case 6://车辆股价
 //                        Intent intent_buy = new Intent(context, FindBuyActivity.class);
@@ -195,7 +200,7 @@ public class HomeFragment extends LazyLoadFragment {
         itemDecoration.setDrawLastItem(false);
         ervList.addItemDecoration(itemDecoration);
 
-        ervList.setAdapterWithProgress(adapterNewGoodsList = new RecyclerArrayAdapter<NewGoodsList.DataBean>(context) {
+        ervList.setAdapterWithProgress(adapterNewGoodsList = new RecyclerArrayAdapter<NewGoodsList>(context) {
             @Override
             public BaseViewHolder OnCreateViewHolder(ViewGroup parent, int viewType) {
                 return new NewGoodsListHolder(parent);
@@ -292,127 +297,95 @@ public class HomeFragment extends LazyLoadFragment {
      * 获取头条数据
      */
     private void getTopNews() {
-        retrofit2.Call<TopNews> call = RetrofitHelper.instance.getApiHomeService().top_news(
+        Observable observable = RetrofitUtil.getInstance().getmRetrofit().create(ApiHomeService.class).top_news(
                 Data.instance.AdminId
         );
+        RetrofitUtil.getInstance()
+                .setObservable(observable)
+                .base(new SubscriberOnNextListener<BaseResponse<TopNews>>() {
+                    @Override
+                    public void onNext(BaseResponse<TopNews> baseResponse) {
+                        if (baseResponse.getDataInfo() != null) {
+                            tvToutiao.setText(baseResponse.getDataInfo().getTitle());
+                        }
 
-        call.enqueue(new Callback<TopNews>() {
-            @Override
-            public void onResponse(retrofit2.Call<TopNews> call, Response<TopNews> response) {
-                TopNews model = response.body();
-                if (model.getCode() != RetrofitHelper.instance.SUCCESS_CODE) {
-                    return;
-                }
-                tvToutiao.setText(model.getData().get(0).getTitle());
-            }
-
-            @Override
-            public void onFailure(retrofit2.Call<TopNews> call, Throwable t) {
-
-            }
-        });
+                    }
+                });
     }
 
     /**
      * 取轮播图数据
      */
     private void getBanner() {
-        retrofit2.Call<Banner> call = RetrofitHelper.instance.getApiHomeService().banner(
+        Observable observable = RetrofitUtil.getInstance().getmRetrofit().create(ApiHomeService.class).banner(
                 Data.instance.AdminId
         );
+        RetrofitUtil.getInstance()
+                .setObservable(observable)
+                .base(new SubscriberOnNextListener<BaseResponse<Banner>>() {
+                    @Override
+                    public void onNext(BaseResponse<Banner> baseResponse) {
+                        lsBanner.clear();
+                        lsBanner.addAll(baseResponse.getDataList());
+                        if (lsBanner.size() == 1) {
+                            convenientBanner.stopTurning();
+                        }
+                        convenientBanner.stopTurning();
+                        convenientBanner.notifyDataSetChanged();
+                        convenientBanner.setcurrentitem(lsBanner.size() * 10);
+                    }
+                });
 
-        call.enqueue(new Callback<Banner>() {
-            @Override
-            public void onResponse(retrofit2.Call<Banner> call, Response<Banner> response) {
-                Banner banner = response.body();
-                if (banner.getCode() != RetrofitHelper.instance.SUCCESS_CODE) {
-                    return;
-                }
-                lsBanner.clear();
-                lsBanner.addAll(banner.getData());
-                if (lsBanner.size() == 1) {
-                    convenientBanner.stopTurning();
-                }
-                convenientBanner.stopTurning();
-                convenientBanner.notifyDataSetChanged();
-                convenientBanner.setcurrentitem(lsBanner.size() * 10);
-            }
-
-            @Override
-            public void onFailure(retrofit2.Call<Banner> call, Throwable t) {
-
-            }
-        });
     }
 
     /**
      * 取功能图标
      */
     private void getAction() {
-        retrofit2.Call<Utilities> call = RetrofitHelper.instance.getApiHomeService().utilities(
+        Observable observable = RetrofitUtil.getInstance().getmRetrofit().create(ApiHomeService.class).utilities(
                 Data.instance.AdminId
         );
-
-        call.enqueue(new Callback<Utilities>() {
-            @Override
-            public void onResponse(retrofit2.Call<Utilities> call, Response<Utilities> response) {
-                Utilities utilities = response.body();
-                if (utilities.getCode() != RetrofitHelper.instance.SUCCESS_CODE) {
-                    return;
-                }
-                if (utilities.getData().size() > 0) {
-//                    sortList(ls);
-                    List<Utilities.DataBean> list = new ArrayList<Utilities.DataBean>();
-                    int[] intArray = {0, 5, 1, 6, 2, 7, 3, 8, 4, 9};
-                    for (int i : intArray) {
-                        if (utilities.getData().get(i) != null) {
-                            list.add(utilities.getData().get(i));
+        RetrofitUtil.getInstance()
+                .setObservable(observable)
+                .base(new SubscriberOnNextListener<BaseResponse<Utilities>>() {
+                    @Override
+                    public void onNext(BaseResponse<Utilities> baseResponse) {
+                        if (baseResponse.getDataList().size() > 0) {
+                            List<Utilities> list = new ArrayList<Utilities>();
+                            int[] intArray = {0, 5, 1, 6, 2, 7, 3, 8, 4, 9};
+                            for (int i : intArray) {
+                                if (baseResponse.getDataList().get(i) != null) {
+                                    list.add(baseResponse.getDataList().get(i));
+                                }
+                            }
+                            adapterUtilities.clear();
+                            lsActionSort = list;
+                            adapterUtilities.addAll(list);
                         }
                     }
-                    adapterUtilities.clear();
-                    lsActionSort = list;
-                    adapterUtilities.addAll(list);
-                }
-            }
-
-            @Override
-            public void onFailure(retrofit2.Call<Utilities> call, Throwable t) {
-
-            }
-        });
+                });
     }
 
     /**
      * 最新最新优惠
      */
     private void getNewGoodsList() {
-        retrofit2.Call<NewGoodsList> call = RetrofitHelper.instance.getApiHomeService().new_goods_list(
+        Observable observable = RetrofitUtil.getInstance().getmRetrofit().create(ApiHomeService.class).new_goods_list(
                 Data.instance.AdminId
         );
+        RetrofitUtil.getInstance()
+                .setObservable(observable)
+                .base(new SubscriberOnNextListener<BaseResponse<NewGoodsList>>() {
+                    @Override
+                    public void onNext(BaseResponse<NewGoodsList> baseResponse) {
+                        adapterNewGoodsList.clear();
+                        adapterNewGoodsList.addAll(baseResponse.getDataList());
+                    }
+                },context);
 
-        call.enqueue(new Callback<NewGoodsList>() {
-            @Override
-            public void onResponse(retrofit2.Call<NewGoodsList> call, Response<NewGoodsList> response) {
-                swipeContainer.setRefreshing(false);
-                NewGoodsList model = response.body();
-                if (model.getCode() != RetrofitHelper.instance.SUCCESS_CODE) {
-                    return;
-                }
-                if (model.getData().size() > 0) {
-//                    sortList(ls);
-                    adapterNewGoodsList.clear();
-                    adapterNewGoodsList.addAll(model.getData());
-                }
-            }
-
-            @Override
-            public void onFailure(retrofit2.Call<NewGoodsList> call, Throwable t) {
-                swipeContainer.setRefreshing(false);
-            }
-        });
     }
 
-    class LocalImageHolderView implements Holder<Banner.DataBean> {
+    class LocalImageHolderView implements Holder<Banner> {
         private ImageView img;
 
         @Override
@@ -423,7 +396,7 @@ public class HomeFragment extends LazyLoadFragment {
         }
 
         @Override
-        public void UpdateUI(Context context, int position, Banner.DataBean data) {
+        public void UpdateUI(Context context, int position, Banner data) {
             GlideApp.with(context)
                     .load(RetrofitHelper.instance.baseAdminUrl + data.getAd_code())
                     .diskCacheStrategy(DiskCacheStrategy.RESOURCE)
