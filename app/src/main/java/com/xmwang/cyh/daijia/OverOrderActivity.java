@@ -74,8 +74,8 @@ public class OverOrderActivity extends BaseActivity {
                 .base(new SubscriberOnNextListener<BaseResponse<DriveOrderInfo>>() {
                     @Override
                     public void onNext(BaseResponse<DriveOrderInfo> baseResponse) {
-                        if (baseResponse.dataInfo != null) {
-                            DriveOrderInfo dd = baseResponse.dataInfo;
+                        if (baseResponse.getDataInfo() != null) {
+                            DriveOrderInfo dd = baseResponse.getDataInfo();
                             txtKm.setText("行驶距离：" + dd.getRunning_kilometre() + "km");
                             txtMoney.setText("行驶费用：" + dd.getRunning_money() + "元");
                             txtOrderNumber.setText("订单编号：" + dd.getOrder_sn());

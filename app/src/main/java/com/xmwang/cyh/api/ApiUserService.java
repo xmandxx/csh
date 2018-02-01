@@ -41,7 +41,7 @@ public interface ApiUserService   {
     //登录
     @FormUrlEncoded
     @POST("userinfo/login")
-    Observable<BaseResponse> login(@Field("admin_id") String admin_id,
+    Observable<BaseResponse<UserInfo>> login(@Field("admin_id") String admin_id,
                          @Field("mobile_phone") String mobile_phone,
                          @Field("password") String password);
 
