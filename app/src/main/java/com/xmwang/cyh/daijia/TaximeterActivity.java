@@ -29,6 +29,7 @@ import com.amap.api.trace.LBSTraceClient;
 import com.amap.api.trace.TraceListener;
 import com.amap.api.trace.TraceLocation;
 import com.amap.api.trace.TraceStatusListener;
+import com.bigkoo.alertview.OnItemClickListener;
 import com.xmwang.cyh.BaseActivity;
 import com.xmwang.cyh.R;
 import com.xmwang.cyh.api.ApiService;
@@ -71,7 +72,7 @@ import static com.amap.api.maps.AMapUtils.calculateLineDistance;
  * Created by xmWang on 2017/12/25.
  */
 
-public class TaximeterActivity extends BaseActivity implements OnConfirmListener, GeocodeSearch.OnGeocodeSearchListener {
+public class TaximeterActivity extends BaseActivity implements GeocodeSearch.OnGeocodeSearchListener {
     @BindView(R.id.end_location)
     TextView endLocation;
     @BindView(R.id.txt_km)
@@ -111,16 +112,21 @@ public class TaximeterActivity extends BaseActivity implements OnConfirmListener
                 startActivityForResult(new Intent(this, ChooseLocationActivity.class), 200);
                 break;
             case R.id.btn_wait:
-                MyDialog.show(this, "您确定要" + btnWait.getText(), this);
+                Common.alert(this, "您确定要" + btnWait.getText(), new OnItemClickListener() {
+                    @Override
+                    public void onItemClick(Object o, int position) {
+                        setWiat();
+                    }
+                });
                 break;
             case R.id.btn_over:
                 if (isWait) {
                     Toast.makeText(this, "您还有没有结束等待", Toast.LENGTH_SHORT).show();
                     return;
                 }
-                MyDialog.show(this, "您确定要结束服务", new OnConfirmListener() {
+                Common.alert(this, "您确定要结束服务", new OnItemClickListener() {
                     @Override
-                    public void onConfirmClick() {
+                    public void onItemClick(Object o, int position) {
                         lbsTraceClient.stopTrace();
                         overOrder();
                     }
@@ -155,8 +161,7 @@ public class TaximeterActivity extends BaseActivity implements OnConfirmListener
 
     }
 
-    @Override
-    public void onConfirmClick() {
+    public void setWiat() {
         isWait = !isWait;
         if (isWait) {
             btnWait.setText("停止等待");

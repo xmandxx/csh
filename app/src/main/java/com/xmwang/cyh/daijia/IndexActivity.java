@@ -34,10 +34,13 @@ import com.amap.api.services.geocoder.GeocodeResult;
 import com.amap.api.services.geocoder.GeocodeSearch;
 import com.amap.api.services.geocoder.RegeocodeQuery;
 import com.amap.api.services.geocoder.RegeocodeResult;
+import com.flyco.dialog.widget.ActionSheetDialog;
 import com.xmwang.cyh.BaseActivity;
 import com.xmwang.cyh.MyApplication;
 import com.xmwang.cyh.R;
 import com.xmwang.cyh.api.ApiService;
+import com.xmwang.cyh.common.CheckVersion;
+import com.xmwang.cyh.common.Common;
 import com.xmwang.cyh.common.Data;
 import com.xmwang.cyh.common.RetrofitHelper;
 import com.xmwang.cyh.common.retrofit.RetrofitUtil;
@@ -172,7 +175,10 @@ public class IndexActivity extends BaseActivity implements OnCameraChangeListene
     LocationSource.OnLocationChangedListener mListener;
     AMapLocationClient mlocationClient;
     AMapLocationClientOption mLocationOption;
+
     private void init() {
+        //检查版本
+        CheckVersion.instance.checkVersion(this);
         //注册事件
         EventBus.getDefault().register(this);
         //防止穿透
@@ -315,7 +321,7 @@ public class IndexActivity extends BaseActivity implements OnCameraChangeListene
                 online();
                 break;
             case R.id.add_order:
-                //创建订单
+//                创建订单
                 if (!Data.instance.getIsOnline()) {
                     ToastUtils.getInstance().toastShow("请先上线");
                     return;

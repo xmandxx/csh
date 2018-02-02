@@ -9,6 +9,7 @@ import com.amap.api.location.AMapLocation;
 import com.amap.api.location.AMapLocationClient;
 import com.amap.api.location.AMapLocationClientOption;
 import com.amap.api.location.AMapLocationListener;
+import com.androidnetworking.AndroidNetworking;
 import com.xmwang.cyh.api.ApiService;
 import com.xmwang.cyh.common.Data;
 import com.xmwang.cyh.common.RetrofitHelper;
@@ -63,6 +64,7 @@ public class MyApplication extends Application implements AMapLocationListener {
     @Override
     public void onCreate() {
         super.onCreate();
+//        AndroidNetworking.initialize(getApplicationContext());
         //极光
         JPushInterface.setDebugMode(true);
         JPushInterface.init(this);

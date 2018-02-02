@@ -11,6 +11,7 @@ import com.xmwang.cyh.common.retrofit.SubscriberOnNextListener;
 import com.xmwang.cyh.model.DriveInfo;
 import com.xmwang.cyh.model.TempInfo;
 import com.xmwang.cyh.model.UserInfo;
+import com.xmwang.cyh.model.VersionModel;
 
 import cn.jpush.android.api.JPushInterface;
 import retrofit2.Callback;
@@ -41,6 +42,15 @@ public enum Data {
     private String formatAddress;
     private String tempDestination;//临时存储目的地，非正式不传递给数据库
 
+    public VersionModel getVersion() {
+        return version;
+    }
+
+    public void setVersion(VersionModel version) {
+        this.version = version;
+    }
+
+    private VersionModel version;
     public String getTempDestination() {
         return tempDestination;
     }

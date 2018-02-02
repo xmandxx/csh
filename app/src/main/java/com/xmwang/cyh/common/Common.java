@@ -1,17 +1,58 @@
 package com.xmwang.cyh.common;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.net.Uri;
+import android.os.Build;
+import android.os.Environment;
+import android.os.Handler;
+import android.support.v4.content.FileProvider;
+import android.util.Log;
 import android.util.TypedValue;
+import android.view.LayoutInflater;
+import android.view.View;
 import android.view.WindowManager;
+import android.widget.ProgressBar;
 
+import com.androidnetworking.AndroidNetworking;
+import com.androidnetworking.common.Priority;
+import com.androidnetworking.error.ANError;
+import com.androidnetworking.interfaces.DownloadListener;
+import com.androidnetworking.interfaces.DownloadProgressListener;
+import com.bigkoo.alertview.AlertView;
+import com.bigkoo.alertview.OnItemClickListener;
 import com.google.gson.Gson;
+import com.xmwang.cyh.MyApplication;
+import com.xmwang.cyh.R;
+import com.xmwang.cyh.api.ApiBaseService;
+import com.xmwang.cyh.common.retrofit.BaseResponse;
+import com.xmwang.cyh.common.retrofit.RetrofitUtil;
+import com.xmwang.cyh.common.retrofit.SubscriberOnNextListener;
+import com.xmwang.cyh.model.VersionModel;
+import com.yanzhenjie.permission.AndPermission;
+import com.yanzhenjie.permission.Permission;
+import com.yanzhenjie.permission.PermissionListener;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
+import java.net.URL;
+
+import retrofit2.http.Url;
+import rx.Observable;
 
 /**
  * Created by xmwang on 2017/12/19.
@@ -21,6 +62,7 @@ public class Common {
     public static String baseUrl = "http://api.itopv.com/base/api/";
     public static String adminId = "1";
     public static String amapKey = "fdd0670eb8a61e9920b280b6fe1f21b8";
+
     public static boolean jpushIsEmpty(String s) {
         if (null == s)
             return true;
@@ -30,29 +72,33 @@ public class Common {
             return true;
         return false;
     }
+
     public static boolean isConnected(Context context) {
         ConnectivityManager conn = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo info = conn.getActiveNetworkInfo();
         return (info != null && info.isConnected());
     }
-    public static boolean isEmpty(String str){
-        if (str == null){
+
+    public static boolean isEmpty(String str) {
+        if (str == null) {
             return true;
         }
-        if (str.isEmpty()){
+        if (str.isEmpty()) {
             return true;
         }
-        if (str.equals("")){
+        if (str.equals("")) {
             return true;
         }
         return false;
     }
+
     public static boolean isEmptyTrim(String str) {
-        if (str == null){
+        if (str == null) {
             return true;
         }
         return Common.isEmpty(str.trim());
     }
+
     /**
      * 验证手机格式
      */
@@ -71,6 +117,7 @@ public class Common {
             return number.trim().matches(num);
         }
     }
+
     public static android.view.Display getWindow(android.content.Context context) {
         WindowManager wm = (WindowManager) context
                 .getSystemService(Context.WINDOW_SERVICE);
@@ -146,7 +193,7 @@ public class Common {
         return (pxVal / context.getResources().getDisplayMetrics().scaledDensity);
     }
 
-    public static Calendar getCalendar(){
+    public static Calendar getCalendar() {
         Calendar c = Calendar.getInstance();//可以对每个时间域单独修改
         return c;
 //        int year = c.get(Calendar.YEAR);
@@ -156,8 +203,10 @@ public class Common {
 //        int minute = c.get(Calendar.MINUTE);
 //        int second = c.get(Calendar.SECOND);
     }
+
     /**
      * 获取系统SDK版本
+     *
      * @return
      */
     public static int getSDKVersionNumber() {
@@ -180,7 +229,7 @@ public class Common {
         String str = "{";
         int i = 0;
         for (String key : map.keySet()) {
-            if (i > 0){
+            if (i > 0) {
                 str += ",";
             }
             str += "\"";
@@ -201,5 +250,34 @@ public class Common {
         String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
         String imageFileName = "JPEG_" + timeStamp + "_";
         return imageFileName;
+    }
+
+    public static void alertForce(Context context, String msg, final OnItemClickListener onItemClickListener) {
+        new AlertView("提示", msg, "去更新", null, null, context,
+                AlertView.Style.Alert, new OnItemClickListener() {
+            @Override
+            public void onItemClick(Object o, int position) {
+                if (position == -1 && onItemClickListener != null) {
+                    onItemClickListener.onItemClick(o, position);
+                }
+            }
+        }).show();
+    }
+
+    public static void alert(Context context, String msg, final OnItemClickListener onItemClickListener, String btnName) {
+        btnName = (btnName != null) ? btnName : "确定";
+        new AlertView("提示", msg, "取消", null, new String[]{"确定"}, context,
+                AlertView.Style.Alert, new OnItemClickListener() {
+            @Override
+            public void onItemClick(Object o, int position) {
+                if (position == 0 && onItemClickListener != null) {
+                    onItemClickListener.onItemClick(o, position);
+                }
+            }
+        }).show();
+    }
+
+    public static void alert(Context context, String msg, final OnItemClickListener onItemClickListener) {
+        alert(context, msg, onItemClickListener,"确定");
     }
 }

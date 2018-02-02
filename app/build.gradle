@@ -8,8 +8,8 @@ android {
         multiDexEnabled true
         minSdkVersion 15
         targetSdkVersion 27
-        versionCode 1
-        versionName "1.0"
+        versionCode 2
+        versionName "1.0.2"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         ndk {
             //选择要添加的对应cpu类型的.so库。
@@ -103,4 +103,7 @@ dependencies {
     compile 'cn.jiguang.sdk:jpush:3.1.1'  // 此处以JPush 3.1.1 版本为例。
     compile 'cn.jiguang.sdk:jcore:1.1.9'  // 此处以JCore 1.1.9 版本为例。
 
+    compile 'com.bigkoo:alertview:1.0.3'
+
+    compile 'com.amitshekhar.android:android-networking:1.0.1'
 }
