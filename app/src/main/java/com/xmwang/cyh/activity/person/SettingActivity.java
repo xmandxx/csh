@@ -1,8 +1,7 @@
-package com.xmwang.cyh.activity.personal;
+package com.xmwang.cyh.activity.person;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 
 import com.xmwang.cyh.BaseActivity;

@@ -356,7 +356,7 @@ public class TaximeterActivity extends BaseActivity implements GeocodeSearch.OnG
                     public void onNext(BaseResponse baseResponse) {
 
                     }
-                }, this);
+                });
     }
 
     private void overOrder() {

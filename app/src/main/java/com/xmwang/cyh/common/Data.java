@@ -174,22 +174,38 @@ public enum Data {
         }
 
     }
-
-    public void reUserInfo() {
+    public void reUserInfo(){
+        reUserInfo(null);
+    }
+    public void reUserInfo(final IUserInfo iUserInfo) {
         if (!this.getIsLogin()) {
             return;
         }
         RetrofitUtil.getInstance()
-                .setObservable(RetrofitUtil.getInstance().getmRetrofit().create(ApiUserService.class).getuserinfo(Data.instance.AdminId, Data.instance.getUserId()))
+                .setObservable(RetrofitUtil.getInstance().getmRetrofit().create(ApiUserService.class).getuserinfo(
+                        Data.instance.AdminId,
+                        Data.instance.getUserId(),
+                        "2",
+                        SystemUtil.getSystemVersion(),
+                        SystemUtil.getSystemModel(),
+                        SystemUtil.getDeviceBrand(),
+                        CheckVersion.instance.getVerName()
+                ))
                 .base(new SubscriberOnNextListener<BaseResponse<UserInfo>>() {
                     @Override
                     public void onNext(BaseResponse<UserInfo> baseResponse) {
                         UserInfo userInfo = baseResponse.getDataInfo();
                         if (userInfo != null) {
                             Data.instance.setUserInfo(userInfo);
+                            if (iUserInfo != null){
+                                iUserInfo.onSuccess(userInfo);
+                            }
                         }
 
                     }
                 });
+    }
+    public interface IUserInfo{
+        public void onSuccess(UserInfo userInfo);
     }
 }

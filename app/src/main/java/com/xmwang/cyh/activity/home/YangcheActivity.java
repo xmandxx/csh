@@ -147,7 +147,11 @@ public class YangcheActivity extends BaseActivity {
             if (SDKVersion < 11) {
                 ((ViewGroup) dp.getDatePicker().getChildAt(0)).getChildAt(2).setVisibility(View.GONE);
             } else if (SDKVersion > 14) {
-                ((ViewGroup) ((ViewGroup) dp.getDatePicker().getChildAt(0)).getChildAt(0)).getChildAt(2).setVisibility(View.GONE);
+                ViewGroup viewGroup = (ViewGroup)(((ViewGroup) ((ViewGroup) dp.getDatePicker().getChildAt(0)).getChildAt(0)).getChildAt(2));
+                if (viewGroup!= null){
+                    viewGroup.setVisibility(View.GONE);
+                }
+
             }
         }
     }

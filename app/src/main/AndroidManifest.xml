@@ -6,7 +6,7 @@
     <!-- 相机 -->
     <uses-permission android:name="android.permission.CAMERA" />
     <!-- 拨号权限 -->
-    <uses-permission android:name="android.permission.CALL_PHONE"></uses-permission>
+    <uses-permission android:name="android.permission.CALL_PHONE" />
     <!-- 添加读写权限 -->
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
@@ -29,13 +29,14 @@
     //定位包、导航包需要的额外权限（注：基础权限也需要）
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_LOCATION_EXTRA_COMMANDS" />
-    <!--用于申请获取蓝牙信息进行室内定位-->
-    <uses-permission android:name="android.permission.BLUETOOTH"></uses-permission>
-    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN"></uses-permission>
+    <!-- 用于申请获取蓝牙信息进行室内定位 -->
+    <uses-permission android:name="android.permission.BLUETOOTH" />
+    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
     <!-- Required -->
     <permission
         android:name="com.xmwang.cyh.permission.JPUSH_MESSAGE"
         android:protectionLevel="signature" />
+
     <uses-permission android:name="com.xmwang.cyh.permission.JPUSH_MESSAGE" />
     <uses-permission android:name="android.permission.RECEIVE_USER_PRESENT" />
     <uses-permission android:name="android.permission.VIBRATE" />
@@ -44,6 +45,7 @@
     <!-- Optional. Required for location feature -->
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" /> <!-- 用于开启 debug 版本的应用在6.0 系统上 层叠窗口权限 -->
     <uses-permission android:name="android.permission.GET_TASKS" />
+
     <application
         android:name=".MyApplication"
         android:allowBackup="true"
@@ -54,62 +56,60 @@
         android:theme="@style/AppTheme"
         tools:replace="android:icon, android:label">
         <provider
-            android:authorities="com.xmwang.cyh"
             android:name="android.support.v4.content.FileProvider"
-            android:grantUriPermissions="true"
+            android:authorities="com.xmwang.cyh"
             android:exported="false"
-            >
-            <meta-data android:name="android.support.FILE_PROVIDER_PATHS"
-                android:resource="@xml/file_paths"/>
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/file_paths" />
         </provider>
-        <!--支付宝-->
+        <!-- 支付宝 -->
         <activity
             android:name="com.alipay.sdk.app.H5PayActivity"
             android:configChanges="orientation|keyboardHidden|navigation|screenSize"
             android:exported="false"
             android:screenOrientation="behind"
-            android:windowSoftInputMode="adjustResize|stateHidden" >
-        </activity>
+            android:windowSoftInputMode="adjustResize|stateHidden" />
         <activity
             android:name="com.alipay.sdk.app.H5AuthActivity"
             android:configChanges="orientation|keyboardHidden|navigation"
             android:exported="false"
             android:screenOrientation="behind"
-            android:windowSoftInputMode="adjustResize|stateHidden" >
-        </activity>
-        <!--支付宝end-->
+            android:windowSoftInputMode="adjustResize|stateHidden" />
+        <!-- 支付宝end -->
         <!-- 定位需要的服务 使用2.0的定位需要加上这个 -->
         <service android:name="com.amap.api.location.APSService" />
         <!-- 高德key -->
         <meta-data
             android:name="com.amap.api.v2.apikey"
             android:value="fdd0670eb8a61e9920b280b6fe1f21b8" />
-        <!--极光-->
-        <!-- Rich push 核心功能 since 2.0.6-->
+        <!-- 极光 -->
+        <!-- Rich push 核心功能 since 2.0.6 -->
         <activity
             android:name="cn.jpush.android.ui.PopWinActivity"
             android:exported="false"
-            android:theme="@style/MyDialogStyle">
-        </activity>
-        <!-- Required SDK核心功能-->
+            android:theme="@style/MyDialogStyle" />
+        <!-- Required SDK核心功能 -->
         <activity
             android:name="cn.jpush.android.ui.PushActivity"
             android:configChanges="orientation|keyboardHidden"
-            android:theme="@android:style/Theme.NoTitleBar"
-            android:exported="false">
+            android:exported="false"
+            android:theme="@android:style/Theme.NoTitleBar">
             <intent-filter>
                 <action android:name="cn.jpush.android.ui.PushActivity" />
+
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="com.xmwang.cyh" />
             </intent-filter>
         </activity>
 
-        <!-- Required SDK 核心功能-->
+        <!-- Required SDK 核心功能 -->
         <!-- 可配置android:process参数将PushService放在其他进程中 -->
         <service
             android:name="cn.jpush.android.service.PushService"
-            android:process=":mult"
             android:exported="false"
+            android:process=":mult"
             tools:replace="android:process">
             <intent-filter>
                 <action android:name="cn.jpush.android.intent.REGISTER" />
@@ -118,12 +118,13 @@
                 <action android:name="cn.jpush.android.intent.PUSH_TIME" />
             </intent-filter>
         </service>
-        <!-- since 3.0.9 Required SDK 核心功能-->
-        <!--<provider-->
-            <!--android:authorities="com.xmwang.cyh.DataProvider"-->
-            <!--android:name="cn.jpush.android.service.DataProvider"-->
-            <!--android:exported="false"-->
-            <!--/>-->
+        <!-- since 3.0.9 Required SDK 核心功能 -->
+        <!-- <provider -->
+        <!-- android:authorities="com.xmwang.cyh.DataProvider" -->
+        <!-- android:name="cn.jpush.android.service.DataProvider" -->
+        <!-- android:exported="false" -->
+        <!-- /> -->
+
 
         <!-- since 1.8.0 option 可选项。用于同一设备中不同应用的JPush服务相互拉起的功能。 -->
         <!-- 若不启用该功能可删除该组件，将不拉起其他应用也不能被其他应用拉起 -->
@@ -133,23 +134,22 @@
             android:exported="true">
             <intent-filter>
                 <action android:name="cn.jpush.android.intent.DaemonService" />
+
                 <category android:name="com.xmwang.cyh" />
             </intent-filter>
-
         </service>
-         <!--since 3.1.0 Required SDK 核心功能-->
+        <!-- since 3.1.0 Required SDK 核心功能 -->
         <provider
-            android:authorities="com.xmwang.cyh.DownloadProvider"
             android:name="cn.jpush.android.service.DownloadProvider"
-            android:exported="true"
-            />
-        <!-- Required SDK核心功能-->
+            android:authorities="com.xmwang.cyh.DownloadProvider"
+            android:exported="true" />
+        <!-- Required SDK核心功能 -->
         <receiver
             android:name="cn.jpush.android.service.PushReceiver"
             android:enabled="true"
             android:exported="false">
             <intent-filter android:priority="1000">
-                <action android:name="cn.jpush.android.intent.NOTIFICATION_RECEIVED_PROXY" />   <!--Required  显示通知栏 -->
+                <action android:name="cn.jpush.android.intent.NOTIFICATION_RECEIVED_PROXY" /> <!-- Required  显示通知栏 -->
                 <category android:name="com.xmwang.cyh" />
             </intent-filter>
             <intent-filter>
@@ -165,34 +165,41 @@
             </intent-filter>
         </receiver>
 
-        <!-- Required SDK核心功能-->
-        <receiver android:name="cn.jpush.android.service.AlarmReceiver" android:exported="false"/>
-        <!-- User defined.  For test only  用户自定义的广播接收器-->
+        <!-- Required SDK核心功能 -->
+        <receiver
+            android:name="cn.jpush.android.service.AlarmReceiver"
+            android:exported="false" />
+        <!-- User defined.  For test only  用户自定义的广播接收器 -->
         <receiver
             android:name=".jpush.MyReceiver"
-            android:exported="false"
-            android:enabled="true">
+            android:enabled="true"
+            android:exported="false">
             <intent-filter>
-                <action android:name="cn.jpush.android.intent.REGISTRATION" /> <!--Required  用户注册SDK的intent-->
-                <action android:name="cn.jpush.android.intent.MESSAGE_RECEIVED" /> <!--Required  用户接收SDK消息的intent-->
-                <action android:name="cn.jpush.android.intent.NOTIFICATION_RECEIVED" /> <!--Required  用户接收SDK通知栏信息的intent-->
-                <action android:name="cn.jpush.android.intent.NOTIFICATION_OPENED" /> <!--Required  用户打开自定义通知栏的intent-->
-                <action android:name="cn.jpush.android.intent.CONNECTION" /><!-- 接收网络变化 连接/断开 since 1.6.3 -->
+                <action android:name="cn.jpush.android.intent.REGISTRATION" /> <!-- Required  用户注册SDK的intent -->
+                <action android:name="cn.jpush.android.intent.MESSAGE_RECEIVED" /> <!-- Required  用户接收SDK消息的intent -->
+                <action android:name="cn.jpush.android.intent.NOTIFICATION_RECEIVED" /> <!-- Required  用户接收SDK通知栏信息的intent -->
+                <action android:name="cn.jpush.android.intent.NOTIFICATION_OPENED" /> <!-- Required  用户打开自定义通知栏的intent -->
+                <action android:name="cn.jpush.android.intent.CONNECTION" /> <!-- 接收网络变化 连接/断开 since 1.6.3 -->
                 <category android:name="com.xmwang.cyh" />
             </intent-filter>
         </receiver>
 
-        <!-- User defined.  For test only  用户自定义接收消息器,3.0.7开始支持,目前新tag/alias接口设置结果会在该广播接收器对应的方法中回调-->
+        <!-- User defined.  For test only  用户自定义接收消息器,3.0.7开始支持,目前新tag/alias接口设置结果会在该广播接收器对应的方法中回调 -->
         <receiver android:name=".jpush.MyJPushMessageReceiver">
             <intent-filter>
                 <action android:name="cn.jpush.android.intent.RECEIVE_MESSAGE" />
-                <category android:name="com.xmwang.cyh"></category>
+
+                <category android:name="com.xmwang.cyh" />
             </intent-filter>
         </receiver>
 
-        <!--Required  . Enable it you can get statistics data with channel-->
-        <meta-data android:name="JPUSH_CHANNEL" android:value="android-csh-ny"/>
-        <meta-data android:name="JPUSH_APPKEY" android:value="5bb689da5f0b7f28c4e0c943" /> <!--  </>值来自开发者平台取得的AppKey-->
+        <!-- Required  . Enable it you can get statistics data with channel -->
+        <meta-data
+            android:name="JPUSH_CHANNEL"
+            android:value="android-csh-ny" />
+        <meta-data
+            android:name="JPUSH_APPKEY"
+            android:value="5bb689da5f0b7f28c4e0c943" /> <!-- </>值来自开发者平台取得的AppKey -->
 
         <activity android:name=".MainActivity">
             <intent-filter>
@@ -250,23 +257,23 @@
             android:name=".activity.business.BusinessDetailActivity"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".activity.personal.SettingActivity"
+            android:name=".activity.person.SettingActivity"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".activity.personal.ProfileActivity"
+            android:name=".activity.person.ProfileActivity"
             android:screenOrientation="portrait"
             android:windowSoftInputMode="stateHidden" />
         <activity
-            android:name=".activity.personal.UserAddressActivity"
+            android:name=".activity.person.UserAddressActivity"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".activity.personal.WalletActivity"
+            android:name=".activity.person.WalletActivity"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".activity.personal.RechargeActivity"
+            android:name=".activity.person.RechargeActivity"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".activity.personal.CashActivity"
+            android:name=".activity.person.CashActivity"
             android:screenOrientation="portrait" />
         <activity
             android:name=".activity.home.CouponsActivity"
@@ -284,18 +291,28 @@
             android:name=".activity.home.FuelcardActivity"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".activity.personal.DriverAuthActivity"
+            android:name=".activity.person.DriverAuthActivity"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".activity.personal.MyOrderActivity"
+            android:name=".activity.person.MyOrderActivity"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".activity.personal.MyCarActivity"
+            android:name=".activity.person.MyCarActivity"
             android:screenOrientation="portrait" />
-        <activity android:name=".daijia.ManagerActivity" android:screenOrientation="portrait" />
-        <activity android:name=".daijia.OrderActivity" android:screenOrientation="portrait" />
-        <activity android:name=".daijia.AccActivity" android:screenOrientation="portrait" />
-        <activity android:name=".daijia.OrderDetailActivity" android:screenOrientation="portrait"  />
+        <activity
+            android:name=".daijia.ManagerActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".daijia.OrderActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".daijia.AccActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".daijia.OrderDetailActivity"
+            android:screenOrientation="portrait" />
+        <activity android:name=".activity.person.EditCarActivity" />
+        <activity android:name=".activity.person.CarTypeListActivity"></activity>
     </application>
 
 </manifest>

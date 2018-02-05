@@ -1,46 +1,31 @@
-package com.xmwang.cyh.activity.personal;
+package com.xmwang.cyh.activity.person;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
-import android.os.Environment;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.Toast;
 
-import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.flyco.dialog.listener.OnOperItemClickL;
 import com.flyco.dialog.widget.ActionSheetDialog;
 import com.xmwang.cyh.BaseActivity;
 import com.xmwang.cyh.R;
 import com.xmwang.cyh.application.GlideApp;
-import com.xmwang.cyh.common.SimpleRxGalleryFinal;
 
 import java.io.File;
-import java.util.Observable;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
-import cn.finalteam.rxgalleryfinal.RxGalleryFinal;
 import cn.finalteam.rxgalleryfinal.RxGalleryFinalApi;
-import cn.finalteam.rxgalleryfinal.imageloader.ImageLoaderType;
 import cn.finalteam.rxgalleryfinal.rxbus.RxBusResultDisposable;
 import cn.finalteam.rxgalleryfinal.rxbus.event.ImageRadioResultEvent;
 import cn.finalteam.rxgalleryfinal.ui.activity.MediaActivity;
-import cn.finalteam.rxgalleryfinal.ui.base.IRadioImageCheckedListener;
 import cn.finalteam.rxgalleryfinal.utils.Logger;
 import cn.finalteam.rxgalleryfinal.utils.MediaScanner;
 import cn.finalteam.rxgalleryfinal.utils.PermissionCheckUtils;
-import okhttp3.MediaType;
-import okhttp3.MultipartBody;
-import okhttp3.RequestBody;
 
 public class DriverAuthActivity extends BaseActivity {
 
@@ -60,7 +45,7 @@ public class DriverAuthActivity extends BaseActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_personal_driver_auth);
+        setContentView(R.layout.activity_person_driver_auth);
         ButterKnife.bind(this);
         dialog = new ActionSheetDialog(this, stringItems, null);
     }

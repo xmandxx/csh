@@ -1,13 +1,9 @@
-package com.xmwang.cyh.activity.personal;
+package com.xmwang.cyh.activity.person;
 
-import android.content.BroadcastReceiver;
-import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.os.Bundle;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
-import android.text.TextUtils;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -19,18 +15,14 @@ import com.jude.easyrecyclerview.adapter.RecyclerArrayAdapter;
 import com.jude.easyrecyclerview.decoration.DividerDecoration;
 import com.xmwang.cyh.BaseActivity;
 import com.xmwang.cyh.R;
-import com.xmwang.cyh.api.ApiService;
 import com.xmwang.cyh.api.ApiUserService;
 import com.xmwang.cyh.common.Data;
-import com.xmwang.cyh.common.RetrofitHelper;
 import com.xmwang.cyh.common.SADialog;
 import com.xmwang.cyh.common.event.MyCarEvent;
 import com.xmwang.cyh.common.retrofit.BaseResponse;
 import com.xmwang.cyh.common.retrofit.RetrofitUtil;
 import com.xmwang.cyh.common.retrofit.SubscriberOnNextListener;
-import com.xmwang.cyh.model.BaseModel;
 import com.xmwang.cyh.model.LoveCarModel;
-import com.xmwang.cyh.utils.ToastUtils;
 import com.xmwang.cyh.viewholder.MyCarHolder;
 
 import org.greenrobot.eventbus.EventBus;
@@ -40,8 +32,6 @@ import org.greenrobot.eventbus.ThreadMode;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
-import retrofit2.Callback;
-import retrofit2.Response;
 import rx.Observable;
 
 public class MyCarActivity extends BaseActivity {
@@ -53,7 +43,7 @@ public class MyCarActivity extends BaseActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_personal_my_car);
+        setContentView(R.layout.activity_person_my_car);
         ButterKnife.bind(this);
         init();
     }
@@ -70,7 +60,7 @@ public class MyCarActivity extends BaseActivity {
                 finish();
                 break;
             case R.id.title_right:
-                addCar();
+                startActivity(new Intent(this,EditCarActivity.class));
                 break;
         }
     }
@@ -106,6 +96,9 @@ public class MyCarActivity extends BaseActivity {
                 });
 //            }
                 dialog_call.show();
+                break;
+            case 4://刷新
+                getList();
                 break;
         }
     }
@@ -178,8 +171,5 @@ public class MyCarActivity extends BaseActivity {
 
                     }
                 },this);
-    }
-    private void addCar(){
-
     }
 }

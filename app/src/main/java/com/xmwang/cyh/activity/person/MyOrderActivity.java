@@ -1,19 +1,14 @@
-package com.xmwang.cyh.activity.personal;
+package com.xmwang.cyh.activity.person;
 
 import android.app.Fragment;
 import android.app.FragmentManager;
 import android.support.design.widget.TabLayout;
 import android.support.v13.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 
 import com.xmwang.cyh.BaseActivity;
 import com.xmwang.cyh.R;
-import com.xmwang.cyh.activity.home.CouponsActivity;
-import com.xmwang.cyh.activity.home.ExceedCouponsFragment;
-import com.xmwang.cyh.activity.home.MyCouponsFragment;
-import com.xmwang.cyh.activity.home.QiangCouponsFragment;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -37,7 +32,7 @@ public class MyOrderActivity extends BaseActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_personal_my_order);
+        setContentView(R.layout.activity_person_my_order);
         ButterKnife.bind(this);
         init();
     }

@@ -222,7 +222,7 @@ public enum  CheckVersion {
     /**
      * 安装apk
      */
-    private static void installApk(final Context context) {
+    private void installApk(final Context context) {
         // 获取当前sdcard存储路径
         File apkFile = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/updateApkFile/" +
                 getVerName());
@@ -251,7 +251,7 @@ public enum  CheckVersion {
      *
      * @return
      */
-    public static int getVersionCode() {
+    public int getVersionCode() {
         int versionCode = 0;
         try {
             //获取软件版本号，对应AndroidManifest.xml下android:versionCode
@@ -268,7 +268,7 @@ public enum  CheckVersion {
      *
      * @return
      */
-    public static String getVerName() {
+    public String getVerName() {
         String verName = "";
         try {
             verName = MyApplication.getContext().getPackageManager().

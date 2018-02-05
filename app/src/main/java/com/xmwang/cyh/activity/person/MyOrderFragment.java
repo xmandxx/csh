@@ -1,4 +1,4 @@
-package com.xmwang.cyh.activity.personal;
+package com.xmwang.cyh.activity.person;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
@@ -17,20 +17,15 @@ import com.xmwang.cyh.R;
 import com.xmwang.cyh.api.ApiUserService;
 import com.xmwang.cyh.common.Data;
 import com.xmwang.cyh.common.LazyLoadFragment;
-import com.xmwang.cyh.common.RetrofitHelper;
 import com.xmwang.cyh.common.retrofit.BaseResponse;
 import com.xmwang.cyh.common.retrofit.RetrofitUtil;
 import com.xmwang.cyh.common.retrofit.SubscriberOnNextListener;
-import com.xmwang.cyh.model.MyCouponsModel;
 import com.xmwang.cyh.model.OrderModel;
-import com.xmwang.cyh.viewholder.MyCouponsListHolder;
 import com.xmwang.cyh.viewholder.MyorderHolder;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
-import retrofit2.Callback;
-import retrofit2.Response;
 import rx.Observable;
 
 /**

@@ -1,14 +1,12 @@
-package com.xmwang.cyh.activity.personal;
+package com.xmwang.cyh.activity.person;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.TextView;
 
 import com.xmwang.cyh.BaseActivity;
 import com.xmwang.cyh.R;
-import com.xmwang.cyh.activity.user.RegisterActivity;
 import com.xmwang.cyh.common.Data;
 
 import butterknife.BindView;
@@ -23,7 +21,7 @@ public class WalletActivity extends BaseActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_personal_wallet);
+        setContentView(R.layout.activity_person_wallet);
         ButterKnife.bind(this);
         txtMoney.setText(Data.instance.getUserInfo().getUser_money());
     }

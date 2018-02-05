@@ -1,28 +1,6 @@
 {
     "logs": [
         {
-            "outputFile": "/Developer/Android/csh/sweet_alert_dialog_library/build/intermediates/incremental/mergeDebugAndroidTestResources/merged.dir/values-w480dp-v13/values-w480dp-v13.xml",
-            "map": [
-                {
-                    "source": "/Users/xw/.gradle/caches/transforms-1/files-1.1/appcompat-v7-21.0.0.aar/289f3586624ec6c683f5ff336100a2c2/res/values-w480dp/values.xml",
-                    "from": {
-                        "startLines": "3,4",
-                        "startColumns": "4,4",
-                        "startOffsets": "56,118",
-                        "endColumns": "61,71",
-                        "endOffsets": "113,185"
-                    },
-                    "to": {
-                        "startLines": "2,3",
-                        "startColumns": "4,4",
-                        "startOffsets": "55,117",
-                        "endColumns": "61,71",
-                        "endOffsets": "112,184"
-                    }
-                }
-            ]
-        },
-        {
             "outputFile": "/Developer/android/csh/sweet_alert_dialog_library/build/intermediates/incremental/mergeDebugAndroidTestResources/merged.dir/values-w480dp-v13/values-w480dp-v13.xml",
             "map": [
                 {

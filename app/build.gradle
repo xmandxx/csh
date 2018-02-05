@@ -8,8 +8,8 @@ android {
         multiDexEnabled true
         minSdkVersion 15
         targetSdkVersion 27
-        versionCode 2
-        versionName "1.0.2"
+        versionCode 3
+        versionName "1.0.3"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         ndk {
             //选择要添加的对应cpu类型的.so库。
@@ -17,9 +17,9 @@ android {
             // 还可以添加 'x86', 'x86_64', 'mips', 'mips64'
         }
         manifestPlaceholders = [
-                JPUSH_PKGNAME : "com.xmwang.cyh",
+                JPUSH_PKGNAME: "com.xmwang.cyh",
                 JPUSH_APPKEY : "5bb689da5f0b7f28c4e0c943", //JPush上注册的包名对应的appkey.
-                JPUSH_CHANNEL : "android-csh-ny", //暂时填写默认值即可.
+                JPUSH_CHANNEL: "android-csh-ny", //暂时填写默认值即可.
         ]
     }
     buildTypes {

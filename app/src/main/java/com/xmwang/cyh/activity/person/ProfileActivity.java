@@ -1,9 +1,8 @@
-package com.xmwang.cyh.activity.personal;
+package com.xmwang.cyh.activity.person;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.EditText;
@@ -15,21 +14,15 @@ import com.xmwang.cyh.BaseActivity;
 import com.xmwang.cyh.R;
 import com.xmwang.cyh.api.ApiUserService;
 import com.xmwang.cyh.common.Data;
-import com.xmwang.cyh.common.RetrofitHelper;
 import com.xmwang.cyh.common.retrofit.BaseResponse;
 import com.xmwang.cyh.common.retrofit.RetrofitUtil;
 import com.xmwang.cyh.common.retrofit.SubscriberOnNextListener;
-import com.xmwang.cyh.model.BaseModel;
 import com.xmwang.cyh.model.UserInfo;
 import com.xmwang.cyh.utils.ToastUtils;
-
-import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
-import retrofit2.Callback;
-import retrofit2.Response;
 import rx.Observable;
 
 public class ProfileActivity extends BaseActivity {
@@ -49,26 +42,32 @@ public class ProfileActivity extends BaseActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_personal_profile);
+        setContentView(R.layout.activity_person_profile);
         ButterKnife.bind(this);
         init();
     }
 
     private void init() {
-        RetrofitUtil.getInstance()
-                .setObservable(RetrofitUtil.getInstance().getmRetrofit().create(ApiUserService.class).getuserinfo(Data.instance.AdminId, Data.instance.getUserId()))
-                .base(new SubscriberOnNextListener<BaseResponse<UserInfo>>() {
-                    @Override
-                    public void onNext(BaseResponse<UserInfo> baseResponse) {
-                        UserInfo userInfo = baseResponse.getDataInfo();
-                        if (userInfo != null) {
-                            txtRealName.setText(userInfo.getReal_name());
-                            txtCyName.setText(userInfo.getUser_name());
-                            txtGender.setText(userInfo.getSex() == 1 ? "男" : "女");
-                            gender = String.valueOf(userInfo.getSex());
-                        }
-                    }
-                });
+//        RetrofitUtil.getInstance()
+//                .setObservable(RetrofitUtil.getInstance().getmRetrofit().create(ApiUserService.class).getuserinfo(Data.instance.AdminId, Data.instance.getUserId()))
+//                .base(new SubscriberOnNextListener<BaseResponse<UserInfo>>() {
+//                    @Override
+//                    public void onNext(BaseResponse<UserInfo> baseResponse) {
+//                        UserInfo userInfo = baseResponse.getDataInfo();
+//
+//                    }
+//                });
+        Data.instance.reUserInfo(new Data.IUserInfo() {
+            @Override
+            public void onSuccess(UserInfo userInfo) {
+                if (userInfo != null) {
+                    txtRealName.setText(userInfo.getReal_name());
+                    txtCyName.setText(userInfo.getUser_name());
+                    txtGender.setText(userInfo.getSex() == 1 ? "男" : "女");
+                    gender = String.valueOf(userInfo.getSex());
+                }
+            }
+        });
     }
 
     @OnClick({R.id.title_back, R.id.btn_img, R.id.ll_profile, R.id.ll_gender, R.id.ll_qcode, R.id.btn_save})

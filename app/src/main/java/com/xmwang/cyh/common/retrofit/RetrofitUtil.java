@@ -10,6 +10,7 @@ import com.xmwang.cyh.model.Reckon;
 import com.xmwang.cyh.model.UserInfo;
 
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -55,6 +56,12 @@ public class RetrofitUtil {
             }
         }
         return mInstance;
+    }
+    public Map<String, String> baseParam(){
+        Map<String, String> param = new HashMap<>();
+        param.put("admin_id", Data.instance.AdminId);
+        param.put("user_id", Data.instance.getUserId());
+        return param;
     }
     public Retrofit getmRetrofit() {
         return mRetrofit;

@@ -13,19 +13,15 @@ import android.widget.TextView;
 
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.xmwang.cyh.R;
-import com.xmwang.cyh.activity.personal.DriverAuthActivity;
-import com.xmwang.cyh.activity.personal.MyCarActivity;
-import com.xmwang.cyh.activity.personal.MyOrderActivity;
-import com.xmwang.cyh.activity.personal.SettingActivity;
-import com.xmwang.cyh.activity.personal.WalletActivity;
-import com.xmwang.cyh.api.ApiUserService;
+import com.xmwang.cyh.activity.person.DriverAuthActivity;
+import com.xmwang.cyh.activity.person.MyCarActivity;
+import com.xmwang.cyh.activity.person.MyOrderActivity;
+import com.xmwang.cyh.activity.person.SettingActivity;
+import com.xmwang.cyh.activity.person.WalletActivity;
 import com.xmwang.cyh.application.GlideApp;
 import com.xmwang.cyh.common.Data;
 import com.xmwang.cyh.common.LazyLoadFragment;
 import com.xmwang.cyh.common.RetrofitHelper;
-import com.xmwang.cyh.common.retrofit.BaseResponse;
-import com.xmwang.cyh.common.retrofit.RetrofitUtil;
-import com.xmwang.cyh.common.retrofit.SubscriberOnNextListener;
 import com.xmwang.cyh.model.UserInfo;
 import com.xmwang.cyh.utils.ToastUtils;
 
@@ -33,8 +29,6 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import butterknife.Unbinder;
-import retrofit2.Callback;
-import retrofit2.Response;
 
 /**
  * Created by xmwang on 2018/1/4.
@@ -64,7 +58,7 @@ public class PersonalFragment extends LazyLoadFragment {
 
     @Override
     protected int setLayout() {
-        return R.layout.fragment_personal;
+        return R.layout.fragment_person;
     }
 
     @Override
@@ -92,18 +86,26 @@ public class PersonalFragment extends LazyLoadFragment {
         }
     }
     private void loadData(){
-        RetrofitUtil.getInstance()
-                .setObservable(RetrofitUtil.getInstance().getmRetrofit().create(ApiUserService.class).getuserinfo(Data.instance.AdminId, Data.instance.getUserId()))
-                .base(new SubscriberOnNextListener<BaseResponse<UserInfo>>() {
-                    @Override
-                    public void onNext(BaseResponse<UserInfo> baseResponse) {
-                        UserInfo userInfo = baseResponse.getDataInfo();
-                        if (userInfo != null) {
-                            Data.instance.setUserInfo(userInfo);
-                        }
-                        loadUI();
-                    }
-                });
+//        RetrofitUtil.getInstance()
+//                .setObservable(RetrofitUtil.getInstance().getmRetrofit().create(ApiUserService.class).getuserinfo(Data.instance.AdminId, Data.instance.getUserId()))
+//                .base(new SubscriberOnNextListener<BaseResponse<UserInfo>>() {
+//                    @Override
+//                    public void onNext(BaseResponse<UserInfo> baseResponse) {
+//                        UserInfo userInfo = baseResponse.getDataInfo();
+//                        if (userInfo != null) {
+//                            Data.instance.setUserInfo(userInfo);
+//                        }
+//                        loadUI();
+//                    }
+//                });
+        Data.instance.reUserInfo(new Data.IUserInfo() {
+            @Override
+            public void onSuccess(UserInfo userInfo) {
+                if (userInfo != null) {
+                    loadUI();
+                }
+            }
+        });
 //        retrofit2.Call<UserInfo> call = RetrofitHelper.instance.getApiUserService().getuserinfo(
 //                Data.instance.AdminId,
 //                Data.instance.getUserId()

@@ -2,12 +2,16 @@ package com.xmwang.cyh.api;
 
 import com.xmwang.cyh.common.retrofit.BaseResponse;
 import com.xmwang.cyh.model.BaseModel;
+import com.xmwang.cyh.model.CarType;
 import com.xmwang.cyh.model.LoveCarModel;
 import com.xmwang.cyh.model.OrderModel;
 import com.xmwang.cyh.model.UserInfo;
 
+import java.util.Map;
+
 import retrofit2.Call;
 import retrofit2.http.Field;
+import retrofit2.http.FieldMap;
 import retrofit2.http.FormUrlEncoded;
 import retrofit2.http.POST;
 import rx.Observable;
@@ -49,7 +53,13 @@ public interface ApiUserService   {
     @FormUrlEncoded
     @POST("userinfo/getuserinfo")
 //    Observable<UserInfo> getuserinfo(@Field("admin_id") String admin_id, @Field("user_id") String user_id);
-    Observable<BaseResponse<UserInfo>> getuserinfo(@Field("admin_id") String admin_id, @Field("user_id") String user_id);
+    Observable<BaseResponse<UserInfo>> getuserinfo(@Field("admin_id") String admin_id,
+                                                   @Field("user_id") String user_id,
+                                                   @Field("phone_type") String phone_type,
+                                                   @Field("phone_system_version") String phone_system_version,
+                                                   @Field("phone_system_model") String phone_system_model,
+                                                   @Field("phone_device_brand") String phone_device_brand,
+                                                   @Field("version_name") String version_name);
 
     //编辑用户信息
     @FormUrlEncoded
@@ -83,4 +93,10 @@ public interface ApiUserService   {
                                       @Field("user_id") String user_id,
                                       @Field("car_id") int car_id,
                                       @Field("type") int type);
+    @FormUrlEncoded
+    @POST("userinfo/edit_user_car")
+    Observable<BaseResponse> edit_user_car(@FieldMap Map<String, String> options);
+    @FormUrlEncoded
+    @POST("userinfo/car_type_list")
+    Observable<BaseResponse<CarType>> car_type_list(@Field("admin_id") String admin_id);
 }
