@@ -6,23 +6,24 @@ import com.xmwang.cyh.api.ApiService;
 import com.xmwang.cyh.api.ApiUserService;
 import com.xmwang.cyh.common.Data;
 import com.xmwang.cyh.model.DriveInfoModel;
+import com.xmwang.cyh.model.MoneyModel;
 import com.xmwang.cyh.model.Reckon;
 import com.xmwang.cyh.model.UserInfo;
-
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
+import rx.android.schedulers.AndroidSchedulers;
 import okhttp3.OkHttpClient;
 import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava.RxJavaCallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
 import rx.Observable;
-import rx.Subscriber;
-import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
+
+
 /**
  * Created by xmwang on 2018/1/30.
  */
@@ -84,6 +85,7 @@ public class RetrofitUtil {
                     .unsubscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe(new ProgressSubscriber(onNextListener));
+
         }
     }
     public void base(SubscriberOnNextListener onNextListener,Context context){

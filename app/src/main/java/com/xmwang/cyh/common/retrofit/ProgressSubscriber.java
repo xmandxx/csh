@@ -73,8 +73,9 @@ public class ProgressSubscriber<T> extends Subscriber<T> implements ProgressCanc
             ToastUtils.getInstance().toastShow("网络中断，请检查您的网络状态");
 //            Toast.makeText(DemoApplication.getAppContext(), "网络中断，请检查您的网络状态", Toast.LENGTH_SHORT).show();
         } else {
+            ToastUtils.getInstance().toastShow("网络错误");
             if (!TextUtils.isEmpty(e.getMessage())) {
-                ToastUtils.getInstance().toastShow(e.getMessage());
+//                ToastUtils.getInstance().toastShow(e.getMessage());
             }
 //            Toast.makeText(DemoApplication.getAppContext(), "error:" + e.getMessage(), Toast.LENGTH_SHORT).show();
         }
@@ -86,7 +87,14 @@ public class ProgressSubscriber<T> extends Subscriber<T> implements ProgressCanc
     @Override
     public void onNext(T t) {
         if (mListener != null) {
-            mListener.onNext(t);
+            BaseResponse baseResponse = (BaseResponse)t;
+            if (baseResponse.isSuccess()){
+                mListener.onNext(t);
+            }else{
+                if (!TextUtils.isEmpty(baseResponse.message)){
+                    ToastUtils.getInstance().toastShow(baseResponse.message);
+                }
+            }
         }
     }
 
