@@ -154,6 +154,7 @@
                 android:layout_gravity="end"
                 android:textAlignment="textEnd"
                 android:background="@null"
+                android:inputType="numberDecimal"
                 />
         </LinearLayout>
         <!--<LinearLayout-->

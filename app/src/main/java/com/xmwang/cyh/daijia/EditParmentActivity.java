@@ -215,7 +215,7 @@ public class EditParmentActivity extends BaseActivity implements RadioGroup.OnCh
                     public void onNext(BaseResponse baseResponse) {
                         ToastUtils.getInstance().toastShow(baseResponse.message);
                     }
-                });
+                },this);
 //        RetrofitUtil.getInstance().setDefaultTemp(param,new SubscriberOnNextListener<BaseResponse>() {
 //            @Override
 //            public void onNext(BaseResponse baseResponse) {

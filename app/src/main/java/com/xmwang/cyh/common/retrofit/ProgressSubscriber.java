@@ -2,11 +2,18 @@ package com.xmwang.cyh.common.retrofit;
 
 import com.xmwang.cyh.MyApplication;
 import com.xmwang.cyh.utils.ToastUtils;
+
 import android.content.Context;
+import android.content.DialogInterface;
+import android.graphics.Color;
 import android.text.TextUtils;
+
 import java.net.ConnectException;
 import java.net.SocketTimeoutException;
+
+import cn.pedant.SweetAlert.SweetAlertDialog;
 import rx.Subscriber;
+
 /**
  * @author nanchen
  * @fileName RetrofitRxDemoo
@@ -14,32 +21,42 @@ import rx.Subscriber;
  * @date 2016/12/12  14:48
  */
 
-public class ProgressSubscriber<T> extends Subscriber<T> implements ProgressCancelListener {
+public class ProgressSubscriber<T> extends Subscriber<T> {
 
     private SubscriberOnNextListener<T> mListener;
     private Context mContext;
-    private ProgressDialogHandler mHandler;
+    SweetAlertDialog pDialog;
 
     public ProgressSubscriber(SubscriberOnNextListener<T> listener, Context context) {
         this.mListener = listener;
         this.mContext = context;
-        mHandler = new ProgressDialogHandler(context, this, true);
+
+        pDialog = new SweetAlertDialog(context, SweetAlertDialog.PROGRESS_TYPE);
+        pDialog.getProgressHelper().setBarColor(Color.parseColor("#A5DC86"));
+        pDialog.setTitleText("Loading");
+        pDialog.setCancelable(false);
+//        pDialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
+//            @Override
+//            public void onCancel(DialogInterface dialog) {
+//                onCancelProgress();
+//            }
+//        });
     }
+
     public ProgressSubscriber(SubscriberOnNextListener<T> listener) {
         this.mListener = listener;
-        mHandler = new ProgressDialogHandler(this, true);
     }
 
     private void showProgressDialog() {
-        if (mHandler != null && mContext != null) {
-            mHandler.obtainMessage(ProgressDialogHandler.SHOW_PROGRESS_DIALOG).sendToTarget();
+        if (pDialog != null && mContext != null) {
+            pDialog.show();
         }
     }
 
     private void dismissProgressDialog() {
-        if (mHandler != null && mContext != null) {
-            mHandler.obtainMessage(ProgressDialogHandler.DISMISS_PROGRESS_DIALOG).sendToTarget();
-            mHandler = null;
+        if (pDialog != null && mContext != null) {
+            pDialog.dismiss();
+            pDialog.cancel();
         }
     }
 
@@ -51,16 +68,12 @@ public class ProgressSubscriber<T> extends Subscriber<T> implements ProgressCanc
     @Override
     public void onStart() {
         super.onStart();
-        if (mContext != null) {
-            showProgressDialog();
-        }
+        showProgressDialog();
     }
 
     @Override
     public void onCompleted() {
-        if (mContext != null) {
-            dismissProgressDialog();
-        }
+        dismissProgressDialog();
 //        Toast.makeText(MyApplication.getContext(),"获取数据完成！",Toast.LENGTH_SHORT).show();
     }
 
@@ -87,18 +100,17 @@ public class ProgressSubscriber<T> extends Subscriber<T> implements ProgressCanc
     @Override
     public void onNext(T t) {
         if (mListener != null) {
-            BaseResponse baseResponse = (BaseResponse)t;
-            if (baseResponse.isSuccess()){
+            BaseResponse baseResponse = (BaseResponse) t;
+            if (baseResponse.isSuccess()) {
                 mListener.onNext(t);
-            }else{
-                if (!TextUtils.isEmpty(baseResponse.message)){
+            } else {
+                if (!TextUtils.isEmpty(baseResponse.message)) {
                     ToastUtils.getInstance().toastShow(baseResponse.message);
                 }
             }
         }
     }
 
-    @Override
     public void onCancelProgress() {
         if (!this.isUnsubscribed()) {
             this.unsubscribe();

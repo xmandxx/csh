@@ -60,6 +60,7 @@ public class EditCarActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_person_edit_car);
         ButterKnife.bind(this);
+        carId = getIntent().getIntExtra("carId",0);
         //注册事件
         EventBus.getDefault().register(this);
     }
@@ -82,7 +83,7 @@ public class EditCarActivity extends AppCompatActivity {
         }
     }
 
-    @OnClick({R.id.title_back, R.id.ll_choose_car_type, R.id.btn_save, R.id.ll_choose_year})
+    @OnClick({R.id.title_back, R.id.ll_choose_car_type, R.id.btn_save, R.id.txt_car_year})
     public void onViewClicked(View view) {
         switch (view.getId()) {
             case R.id.title_back:
@@ -94,7 +95,7 @@ public class EditCarActivity extends AppCompatActivity {
             case R.id.btn_save:
                 save();
                 break;
-            case R.id.ll_choose_year:
+            case R.id.txt_car_year:
                 chooseYear();
                 break;
         }

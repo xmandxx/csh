@@ -73,6 +73,9 @@ public class MyCarActivity extends BaseActivity {
                 setCarStatus(event.getId(),2);
                 break;
             case 2://编辑
+                Intent intent = new Intent(this,EditCarActivity.class);
+                intent.putExtra("carId",event.getId());
+                startActivity(intent);
                 break;
             case 3://删除
                 final NormalDialog dialog_call = new NormalDialog(this);
