@@ -104,7 +104,7 @@ public class ProgressSubscriber<T> extends Subscriber<T> {
             if (baseResponse.isSuccess()) {
                 mListener.onNext(t);
             } else {
-                if (!TextUtils.isEmpty(baseResponse.message)) {
+                if (!TextUtils.isEmpty(baseResponse.message) && (mContext != null)) {
                     ToastUtils.getInstance().toastShow(baseResponse.message);
                 }
             }

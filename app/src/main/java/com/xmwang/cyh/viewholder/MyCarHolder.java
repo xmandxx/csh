@@ -1,5 +1,6 @@
 package com.xmwang.cyh.viewholder;
 
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
@@ -54,12 +55,18 @@ public class MyCarHolder extends BaseViewHolder<LoveCarModel> {
             txtKm.setText(String.valueOf(data.getCar_kilometre()));
             cbkDefault.setChecked(data.getIs_default() == 1);
             if (data.getIs_default() == 1){
-                cbkDefault.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                cbkDefault.setOnTouchListener(new View.OnTouchListener() {
                     @Override
-                    public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
-                        cbkDefault.setChecked(true);
+                    public boolean onTouch(View v, MotionEvent event) {
+                        return true;
                     }
                 });
+//                cbkDefault.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+//                    @Override
+//                    public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
+//                        cbkDefault.setChecked(true);
+//                    }
+//                });
             }else{
                 cbkDefault.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
                     @Override
