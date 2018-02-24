@@ -230,14 +230,15 @@ public class TaximeterActivity extends BaseActivity implements GeocodeSearch.OnG
                     RegeocodeQuery query = new RegeocodeQuery(llp, 100, GeocodeSearch.AMAP);
                     geocoderSearch.getFromLocationAsyn(query);
                 }
-                //
-                LatLng sLL = null;
+                //临时存储上一个经纬度
+                LatLng tempLocation = null;
+                //总里程
                 double distance = 0;
                 for (LatLng ll : rectifications) {
-                    if (sLL != null) {
-                        distance += AMapUtils.calculateLineDistance(sLL, ll);
+                    if (tempLocation != null) {
+                        distance += AMapUtils.calculateLineDistance(tempLocation, ll);
                     }
-                    sLL = ll;
+                    tempLocation = ll;
                 }
                 km = distance / 1000 * Data.instance.getPercentage();
                 km = (double) Math.round(km * 100) / 100;    //转化为2位小数
@@ -391,6 +392,7 @@ public class TaximeterActivity extends BaseActivity implements GeocodeSearch.OnG
     protected void onDestroy() {
         super.onDestroy();
         m_wklk.release(); //解除保持唤醒
+        lbsTraceClient.destroy();
     }
 
     @Override
