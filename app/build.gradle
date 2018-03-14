@@ -8,8 +8,8 @@ android {
         multiDexEnabled true
         minSdkVersion 15
         targetSdkVersion 27
-        versionCode 3
-        versionName "1.0.3"
+        versionCode 4
+        versionName "1.0.4"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         ndk {
             //选择要添加的对应cpu类型的.so库。
@@ -81,7 +81,7 @@ dependencies {
     //仿京东地区选择多级选择菜单(通用版)
     compile project(':library_jdselector')
     //高德相关
-        compile 'com.amap.api:3dmap:latest.integration'
+    compile 'com.amap.api:3dmap:latest.integration'
     //    compile 'com.amap.api:map2d:latest.integration'
 //    compile 'com.amap.api:navi-3dmap:latest.integration'
     compile 'com.amap.api:search:latest.integration'

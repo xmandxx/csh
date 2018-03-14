@@ -217,8 +217,8 @@ public class TaximeterActivity extends BaseActivity implements GeocodeSearch.OnG
 
         geocoderSearch = new GeocodeSearch(this);
         geocoderSearch.setOnGeocodeSearchListener(this);
-
-        lbsTraceClient = LBSTraceClient.getInstance(this);
+        lbsTraceClient = new LBSTraceClient(this.getApplicationContext());
+//        lbsTraceClient = LBSTraceClient.getInstance(this);
         lbsTraceClient.startTrace(new TraceStatusListener() {
             @Override
             public void onTraceStatus(List<TraceLocation> list, List<LatLng> rectifications, String errorInfo) {

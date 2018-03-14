@@ -334,7 +334,8 @@ public class IndexActivity extends BaseActivity implements OnCameraChangeListene
                 break;
             case R.id.edit_parment:
                 //编辑参数
-                startActivity(new Intent(this, EditParmentActivity.class));
+//                startActivity(new Intent(this, EditParmentActivity.class));
+                startActivity(new Intent(this, TaximeterMapActivity.class));
                 break;
             case R.id.title_right:
                 startActivity(new Intent(this, ManagerActivity.class));
@@ -362,6 +363,10 @@ public class IndexActivity extends BaseActivity implements OnCameraChangeListene
     }
 
     private void online() {
+        if (Double.valueOf(Data.instance.getDriveInfo().getDriver_money()) < Data.instance.getDriveInfo().getDriver_min_money()){
+            ToastUtils.getInstance().toastShow("余额不足，接单最低需要"+Data.instance.getDriveInfo().getDriver_min_money()+"元");
+            return;
+        }
 //        SADialog.instance.showProgress(this);
         String ds = Data.instance.getIsOnline() ? "0" : "2";
         Observable observable = RetrofitUtil.getInstance().getmRetrofit().create(ApiService.class).online(

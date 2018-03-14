@@ -9,6 +9,7 @@ import com.amap.api.location.AMapLocation;
 import com.amap.api.location.AMapLocationClient;
 import com.amap.api.location.AMapLocationClientOption;
 import com.amap.api.location.AMapLocationListener;
+import com.amap.api.maps.model.LatLng;
 import com.androidnetworking.AndroidNetworking;
 import com.xmwang.cyh.api.ApiService;
 import com.xmwang.cyh.common.Data;
@@ -178,6 +179,7 @@ public class MyApplication extends Application implements AMapLocationListener {
 //                                ToastUtils.getInstance().toastShow(baseResponse.message);
                             }
                         });
+                Data.instance.setCurrentLocation(new LatLng(amapLocation.getLatitude(),amapLocation.getLongitude()));
             } else {
                 //定位失败时，可通过ErrCode（错误码）信息来确定失败的原因，errInfo是错误信息，详见错误码表。
                 Log.e("AmapError", "location Error, ErrCode:"

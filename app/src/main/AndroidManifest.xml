@@ -312,7 +312,8 @@
             android:name=".daijia.OrderDetailActivity"
             android:screenOrientation="portrait" />
         <activity android:name=".activity.person.EditCarActivity" />
-        <activity android:name=".activity.person.CarTypeListActivity"></activity>
+        <activity android:name=".activity.person.CarTypeListActivity" />
+        <activity android:name=".daijia.TaximeterMapActivity"></activity>
     </application>
 
 </manifest>

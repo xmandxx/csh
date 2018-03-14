@@ -3,6 +3,7 @@ package com.xmwang.cyh.common;
 import android.content.Context;
 import android.location.Location;
 
+import com.amap.api.maps.model.LatLng;
 import com.xmwang.cyh.MyApplication;
 import com.xmwang.cyh.api.ApiUserService;
 import com.xmwang.cyh.common.retrofit.BaseResponse;
@@ -41,6 +42,16 @@ public enum Data {
     private Location location;
     private String formatAddress;
     private String tempDestination;//临时存储目的地，非正式不传递给数据库
+    private LatLng currentLocation;
+
+    public LatLng getCurrentLocation() {
+        return currentLocation;
+    }
+
+    public void setCurrentLocation(LatLng currentLocation) {
+        this.currentLocation = currentLocation;
+    }
+
 
     public VersionModel getVersion() {
         return version;

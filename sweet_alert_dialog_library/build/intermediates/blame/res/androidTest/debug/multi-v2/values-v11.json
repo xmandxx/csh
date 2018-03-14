@@ -1,10 +1,10 @@
 {
     "logs": [
         {
-            "outputFile": "/Developer/Android/csh/sweet_alert_dialog_library/build/intermediates/incremental/mergeDebugAndroidTestResources/merged.dir/values-v11/values-v11.xml",
+            "outputFile": "/Developer/android/csh/sweet_alert_dialog_library/build/intermediates/incremental/mergeDebugAndroidTestResources/merged.dir/values-v11/values-v11.xml",
             "map": [
                 {
-                    "source": "/Users/xw/.gradle/caches/transforms-1/files-1.1/appcompat-v7-21.0.0.aar/289f3586624ec6c683f5ff336100a2c2/res/values-v11/values.xml",
+                    "source": "/Users/wangxiaoming/.gradle/caches/transforms-1/files-1.1/appcompat-v7-21.0.0.aar/c347a801d1ffb52c2ee1009638077692/res/values-v11/values.xml",
                     "from": {
                         "startLines": "3,10,17,24,31,38,45,52,59,61,63,65,162,164,166,172,219,266,314",
                         "startColumns": "4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4",
