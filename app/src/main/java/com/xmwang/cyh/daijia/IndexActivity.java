@@ -334,8 +334,8 @@ public class IndexActivity extends BaseActivity implements OnCameraChangeListene
                 break;
             case R.id.edit_parment:
                 //编辑参数
-//                startActivity(new Intent(this, EditParmentActivity.class));
-                startActivity(new Intent(this, TaximeterMapActivity.class));
+                startActivity(new Intent(this, EditParmentActivity.class));
+//                startActivity(new Intent(this, TaximeterMapActivity.class));
                 break;
             case R.id.title_right:
                 startActivity(new Intent(this, ManagerActivity.class));

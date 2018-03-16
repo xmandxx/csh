@@ -3,6 +3,7 @@ package com.xmwang.cyh;
 import android.app.Application;
 import android.content.Context;
 import android.location.Location;
+import android.support.multidex.MultiDex;
 import android.util.Log;
 
 import com.amap.api.location.AMapLocation;
@@ -189,6 +190,11 @@ public class MyApplication extends Application implements AMapLocationListener {
         }
     }
 
+    @Override
+    protected void attachBaseContext(Context base) {
+        super.attachBaseContext(base);
+        MultiDex.install(this);
+    }
 //    private void getAppInfo() {
 //        // 获取packageManager的实例
 //        PackageManager packageManager = getPackageManager();

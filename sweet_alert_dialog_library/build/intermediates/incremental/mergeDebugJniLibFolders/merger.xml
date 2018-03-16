@@ -1,2 +1,2 @@
 <?xml version="1.0" encoding="utf-8"?>
-<merger version="3"><dataSet config="main"><source path="/Developer/android/csh/sweet_alert_dialog_library/src/main/jniLibs"/></dataSet><dataSet config="debug"><source path="/Developer/android/csh/sweet_alert_dialog_library/src/debug/jniLibs"/></dataSet></merger>
+<merger version="3"><dataSet config="main"><source path="/Developer/Android/csh/sweet_alert_dialog_library/src/main/jniLibs"/></dataSet><dataSet config="debug"><source path="/Developer/Android/csh/sweet_alert_dialog_library/src/debug/jniLibs"/></dataSet></merger>
