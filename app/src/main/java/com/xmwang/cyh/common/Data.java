@@ -95,7 +95,6 @@ public enum Data {
         return location;
     }
 
-
     public void setTempInfo(TempInfo tempInfo) {
         this.tempInfo = tempInfo;
     }

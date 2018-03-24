@@ -93,9 +93,9 @@ public class TaximeterActivity extends BaseActivity implements GeocodeSearch.OnG
     double sumMoney = 0;
     double waitMoney = 0;
     private String destination = Data.instance.getFormatAddress();//传递给数据
-    GeocodeSearch geocoderSearch;
-    LBSTraceClient lbsTraceClient;
-    PowerManager.WakeLock m_wklk;
+    private GeocodeSearch geocoderSearch;
+    private LBSTraceClient lbsTraceClient;
+    private PowerManager.WakeLock m_wklk;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
