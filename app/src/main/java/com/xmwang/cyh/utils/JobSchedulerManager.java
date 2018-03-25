@@ -25,7 +25,10 @@ public class JobSchedulerManager {
 
     private JobSchedulerManager(Context ctxt){
         this.mContext = ctxt;
-        mJobScheduler = (JobScheduler)ctxt.getSystemService(Context.JOB_SCHEDULER_SERVICE);
+        //监测如果api小于21不执行,必须先判断版本 4.4左右会崩溃
+        if(!isBelowLOLLIPOP()) {
+            mJobScheduler = (JobScheduler) ctxt.getSystemService(Context.JOB_SCHEDULER_SERVICE);
+        }
     }
 
     public final static JobSchedulerManager getJobSchedulerInstance(Context ctxt){
@@ -37,8 +40,12 @@ public class JobSchedulerManager {
 
     @TargetApi(21)
     public void startJobScheduler(){
-        // 如果JobService已经启动或API<21，返回
-        if(AliveJobService.isJobServiceAlive() || isBelowLOLLIPOP()){
+        // 如果API<21，返回,必须先判断版本 4.4左右会崩溃
+        if(isBelowLOLLIPOP()) {
+            return;
+        }
+        // 如果JobService已经启动返回
+        if(AliveJobService.isJobServiceAlive()){
             return;
         }
         // 构建JobInfo对象，传递给JobSchedulerService

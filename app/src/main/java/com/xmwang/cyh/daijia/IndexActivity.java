@@ -155,7 +155,7 @@ public class IndexActivity extends BaseActivity implements OnCameraChangeListene
         mScreenManager = ScreenManager.getScreenManagerInstance(this);
         mScreenListener.setScreenReceiverListener(mScreenListenerer);
         // 2. 启动系统任务
-        mJobManager = JobSchedulerManager.getJobSchedulerInstance(this);
+        mJobManager = JobSchedulerManager.getJobSchedulerInstance(IndexActivity.this);
         mJobManager.startJobScheduler();
         // 3.启动保活服务
         Intent intent = new Intent(this, DaemonService.class);
